@@ -1,0 +1,89 @@
+.main-menu-bar {
+  background-color: #ff6600;
+  width: 100%;
+  position: relative;
+  z-index: 999;
+  border-top: 1px solid #e65c00;
+}
+
+/* ĐỔI TÊN CLASS: Dùng tên riêng để không ảnh hưởng Header */
+.container-menu {
+  width: 1200px; /* Chiều rộng chuẩn web */
+  margin: 0 auto; /* Căn giữa màn hình */
+  max-width: 100%;
+  padding: 0 15px; /* Khoảng cách an toàn 2 bên */
+}
+
+.menu-list {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  width: 100%; /* Thêm dòng này: Bắt buộc danh sách rộng hết cỡ */
+}
+
+.menu-item {
+  position: relative;
+  flex: 1; /* QUAN TRỌNG: Lệnh này chia đều 5 mục bằng nhau */
+  text-align: center; /* Căn chữ nằm giữa ô của nó */
+}
+.menu-item > a {
+  display: block;
+  padding: 15px 0; /* Sửa thành 0 ở 2 bên vì đã tự căn giữa rồi */
+  color: white;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: bold;
+  text-transform: uppercase;
+  transition: background-color 0.3s;
+}
+
+.menu-item:hover > a {
+  background-color: #cc5200;
+}
+
+.menu-item i {
+  font-size: 10px;
+  margin-left: 5px;
+  vertical-align: middle;
+}
+
+/* ================= MENU CON (DROPDOWN) ================= */
+.sub-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: white;
+  min-width: 220px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  display: none;
+  list-style: none;
+  padding: 0;
+  border-top: 3px solid #ff6600;
+  z-index: 1000;
+}
+
+.sub-menu li {
+  border-bottom: 1px solid #eee;
+}
+
+.sub-menu li a {
+  display: block;
+  padding: 10px 15px;
+  color: #333;
+  text-decoration: none;
+  font-size: 14px;
+  text-transform: none;
+  font-weight: normal;
+  transition: 0.2s;
+}
+
+.sub-menu li a:hover {
+  color: #ff6600;
+  background-color: #fff8f0;
+  padding-left: 20px;
+}
+
+.menu-item:hover .sub-menu {
+  display: block;
+}

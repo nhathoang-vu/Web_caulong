@@ -1,0 +1,105 @@
+/* --- FILE: assets/css/login.css --- */
+
+/* Khung bao quanh cả trang login để căn giữa */
+.login-page {
+  background-color: #f5f5f5;
+  padding: 80px 0; /* Khoảng cách trên dưới để tách header/footer */
+  min-height: 60vh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start; /* Để form nằm hơi cao lên 1 chút cho đẹp */
+}
+
+/* Khung trắng chứa form */
+.login-container {
+  background-color: #ffffff;
+  width: 100%;
+  max-width: 450px;
+  padding: 40px 30px;
+  border-radius: 8px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05); /* Đổ bóng nhẹ */
+  text-align: center;
+}
+
+/* Tiêu đề "ĐĂNG NHẬP" */
+.login-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #ea580c; /* Màu cam chủ đạo */
+  margin-bottom: 25px;
+  text-transform: uppercase;
+  position: relative;
+  padding-bottom: 10px;
+}
+
+/* Gạch chân dưới tiêu đề */
+.login-title::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 50px;
+  height: 3px;
+  background-color: #ea580c;
+}
+
+/* Các ô input */
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group input {
+  width: 100%;
+  height: 45px;
+  padding: 0 15px;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  font-size: 14px;
+  outline: none;
+  transition: 0.3s;
+}
+
+.form-group input:focus {
+  border-color: #ea580c;
+  box-shadow: 0 0 0 2px rgba(234, 88, 12, 0.1);
+}
+
+/* Nút Đăng nhập */
+.btn-login {
+  width: 100%;
+  height: 45px;
+  background-color: #ea580c;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: background-color 0.3s;
+  margin-top: 10px;
+}
+
+.btn-login:hover {
+  background-color: #c2410c;
+}
+
+/* Link Quên mật khẩu / Đăng ký */
+.form-links {
+  margin-top: 20px;
+  display: flex;
+  justify-content: flex-end; /* Đẩy sang phải */
+  gap: 15px;
+  font-size: 13px;
+}
+
+.form-links a {
+  color: #666;
+  text-decoration: none;
+}
+
+.form-links a:hover {
+  color: #ea580c;
+  text-decoration: underline;
+}

@@ -1,0 +1,13 @@
+
+/* ================= NỘI DUNG TRANG CHỦ ================= */
+main {
+  min-height: 400px;
+  padding: 20px 0;
+  background-color: #f5f5f5;
+}
+
+main h1 {
+  text-align: center;
+  color: #333;
+  margin-top: 50px;
+}

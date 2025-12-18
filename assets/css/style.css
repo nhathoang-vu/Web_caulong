@@ -1,0 +1,203 @@
+/* Reset cơ bản */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+body {
+  background-color: #f9f9f9; /* Màu nền nhẹ cho toàn trang */
+}
+
+/* --- Header Styles --- */
+.main-header {
+  background-color: #fff;
+  border-bottom: 1px solid #ddd;
+  padding: 5x 0; /* Giảm padding trên dưới một chút */
+  width: 100%;
+}
+
+.container {
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  display: flex;
+  align-items: center;
+
+  /* QUAN TRỌNG: Đổi từ space-between thành flex-start */
+  justify-content: flex-start;
+
+  padding: 0 30px;
+}
+
+/* 1. Logo (Đã chỉnh sửa cho logo to) */
+/* 1. Logo */
+/* 1. Logo Area */
+/* 1. Logo Area */
+/* Sửa lại phần này */
+/* --- Sửa trong file style.css --- */
+
+/* --- Trong file style.css --- */
+
+/* --- Trong file style.css --- */
+
+/* --- Trong file style.css --- */
+/* --- Trong file style.css --- */
+.logo-area {
+  height: 90px;
+  width: auto;
+  min-width: 150px;
+  display: flex;
+  align-items: center;
+
+  /* SỬA DÒNG NÀY: Giảm từ 60px xuống 20px (hoặc 10px nếu muốn gần hơn nữa) */
+  margin-right: 20px;
+}
+
+/* 2. Tăng kích thước logo và XÓA BỎ chữ !important */
+.logo-img {
+  height: 80px; /* Tăng từ 50px lên 80px */
+  width: auto;
+  object-fit: contain;
+  display: block;
+  /* LƯU Ý: Đã xóa chữ !important đi rồi nhé */
+}
+/* 2. Info Section (Hotline) */
+/* --- Trong file style.css --- */
+.header-info {
+  display: flex;
+  gap: 25px;
+
+  /* SỬA DÒNG NÀY: Đổi thành 0 (hoặc xóa hẳn dòng này đi) */
+  margin-left: 0;
+}
+
+.info-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px; /* Tăng nhẹ cỡ chữ */
+  font-weight: bold;
+  color: #333;
+}
+
+.icon-orange {
+  color: #ea580c;
+  font-size: 20px;
+}
+
+.info-text .label {
+  color: #555;
+  margin-right: 5px;
+}
+
+.info-text .highlight {
+  color: #e11b1e;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+/* 3. Search Bar (Đã làm to hơn) */
+.search-area {
+  /* Đổi flex-grow thành 0 để không bị giãn quá đà */
+  flex-grow: 0;
+
+  /* Đặt chiều rộng cố định để "độ dài không thay đổi" */
+  width: 500px;
+
+  /* Căn chỉnh khoảng cách: Cách Hotline 40px, cách Giỏ hàng 40px */
+  margin: 0 40px;
+}
+.search-form {
+  display: flex;
+  background-color: #f3f3f3;
+  border-radius: 4px;
+  overflow: hidden;
+  height: 45px; /* Tăng chiều cao thanh tìm kiếm */
+  border: 1px solid #e0e0e0;
+}
+
+.search-form input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 0 20px;
+  outline: none;
+  font-size: 15px;
+  color: #333;
+}
+
+.search-form button {
+  border: none;
+  background: #ea580c; /* Đổi nút tìm kiếm thành màu cam */
+  padding: 0 25px;
+  cursor: pointer;
+  color: #fff; /* Icon màu trắng */
+  font-size: 18px;
+  transition: background-color 0.3s;
+}
+
+.search-form button:hover {
+  background-color: #c2410c; /* Màu cam đậm hơn khi hover */
+}
+
+/* 4. Actions (User, Cart) */
+.header-actions {
+  display: flex;
+  gap: 25px; /* Tăng khoảng cách giữa các icon */
+}
+
+.action-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-decoration: none;
+  color: #333;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.icon-circle {
+  width: 40px; /* Tăng kích thước icon */
+  height: 40px;
+  border: 1px solid #ea580c;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #ea580c;
+  font-size: 18px;
+  margin-bottom: 5px;
+  position: relative;
+  transition: all 0.3s;
+  background-color: #fff;
+}
+
+/* Hiệu ứng hover */
+.action-item:hover .icon-circle {
+  background-color: #ea580c;
+  color: #fff;
+  box-shadow: 0 2px 5px rgba(234, 88, 12, 0.3);
+}
+
+.action-item:hover span {
+  color: #ea580c;
+}
+
+/* Badge số lượng giỏ hàng */
+.cart-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background-color: #e11b1e;
+  color: #fff;
+  font-size: 11px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 2px solid #fff; /* Thêm viền trắng để nổi bật */
+}
