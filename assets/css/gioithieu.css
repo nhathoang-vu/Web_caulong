@@ -1,0 +1,198 @@
+
+        .breadcrumb {
+            background-color: #f5f5f5;
+            padding: 10px 0;
+            margin-bottom: 30px;
+        }
+        .breadcrumb .container {
+            font-size: 14px;
+            color: #333;
+        }
+        .breadcrumb a {
+            color: #333;
+            text-decoration: none;
+        }
+        .breadcrumb span {
+            color: #e65100;
+            font-weight: 500;
+        }
+
+        /* 2. Layout chia 2 cột */
+        .intro-container {
+            display: flex;
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto 50px auto;
+            padding: 0 15px;
+            align-items: flex-start; /* Để sidebar không bị kéo dài xuống */
+        }
+
+        /* Cột bên trái (Sidebar) */
+        .sidebar {
+            width: 30%;
+            border-right: 1px solid #eee; /* Đường kẻ mờ ngăn cách */
+            padding-right: 20px;
+        }
+
+        .sidebar h3 {
+            font-size: 16px;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #333;
+            display: inline-block;
+            padding-bottom: 5px;
+        }
+
+        .news-item {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #f1f1f1;
+            padding-bottom: 10px;
+        }
+
+        .news-thumb {
+            width: 80px;
+            height: 60px;
+            background-color: #eee;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+            font-size: 20px;
+            border-radius: 4px;
+        }
+        
+        .news-info a {
+            font-size: 14px;
+            color: #333;
+            font-weight: 500;
+            text-decoration: none;
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .news-info a:hover {
+            color: #e65100;
+        }
+        .news-date {
+            font-size: 12px;
+            color: #999;
+            margin-top: 5px;
+        }
+
+        /* Cột bên phải (Nội dung chính) */
+        .main-content {
+            width: 70%;
+        }
+
+        .main-content h1 {
+            font-size: 24px;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .meta-info {
+            font-size: 13px;
+            color: #888;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 15px;
+        }
+        .meta-info i { margin-right: 5px; }
+        .meta-info span { margin-right: 15px; }
+
+        .content-text {
+            font-family: Arial, sans-serif;
+            font-size: 15px;
+            line-height: 1.6;
+            color: #333;
+            text-align: justify;
+        }
+        
+        .content-text p { margin-bottom: 15px; }
+        .content-text strong { color: #000; }
+        
+        .highlight { color: #e65100; font-weight: bold; }
+
+        /* Responsive Mobile */
+        @media (max-width: 768px) {
+            .intro-container {
+                flex-direction: column-reverse; /* Đảo ngược để nội dung lên trên, sidebar xuống dưới */
+            }
+            .sidebar, .main-content {
+                width: 100%;
+                border-right: none;
+            }
+        }
+        /* --- CSS CHO PHẦN ĐỘI NGŨ SÁNG LẬP --- */
+
+.founders-section {
+    margin-top: 50px;
+    padding-top: 30px;
+    border-top: 2px solid #eee;
+    width: 100%; /* Đảm bảo khung bao ngoài rộng 100% */
+}
+
+.founders-section h2 {
+    font-size: 22px;
+    font-weight: bold;
+    text-transform: uppercase;
+    margin-bottom: 30px;
+    color: #333;
+    text-align: center;
+}
+
+.founders-grid {
+    display: flex;
+    justify-content: space-between; /* QUAN TRỌNG: Đẩy phần tử ra 2 đầu và giữa */
+    width: 100%;                    /* Tràn hết chiều rộng */
+    gap: 0;                         /* Để space-between tự tính khoảng cách */
+}
+
+.founder-card {
+    width: 32%; /* Chia 3 cột: Mỗi cột chiếm ~32%, phần dư còn lại là khoảng trống */
+    text-align: center;
+    background: #f9f9f9;
+    padding: 20px 10px; /* Padding trên dưới 20, trái phải 10 cho gọn */
+    border-radius: 8px;
+    box-sizing: border-box; /* Đảm bảo padding không làm vỡ khung */
+}
+
+.founder-img {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #e65100;
+    margin-bottom: 15px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.founder-name {
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+}
+
+.founder-role {
+    font-size: 13px;
+    color: #e65100;
+    font-weight: 600;
+}
+
+/* Mobile: Xếp chồng lên nhau */
+@media (max-width: 600px) {
+    .founders-grid {
+        flex-direction: column;
+        gap: 20px;
+    }
+    .founder-card {
+        width: 100%; /* Trên điện thoại thì full màn hình */
+    }
+}
