@@ -2,7 +2,7 @@
     <div class="container">
         <div class="logo-area" style="margin-left: 100px;">
             <a href="index.php">
-                <img src="Logo.png" alt="Logo HBG Shop" class="logo-img" style="position: relative; left: 30px;">
+                <img src="assets/images/logo/Logo.png" alt="Logo HBG Shop" class="logo-img" style="position: relative; left: 30px;">
             </a>
         </div>
 

@@ -1,4 +1,3 @@
-
 /* ================= NỘI DUNG TRANG CHỦ ================= */
 main {
   min-height: 400px;
@@ -10,4 +9,119 @@ main h1 {
   text-align: center;
   color: #333;
   margin-top: 50px;
+}
+/* ================= CSS BANNER FIX LỖI HIỂN THỊ ================= */
+
+/* 1. Reset cơ bản để tránh lề thừa */
+* {
+  box-sizing: border-box; /* Tính kích thước bao gồm cả viền/padding */
+}
+
+/* 2. Khung chứa chính */
+.slider-container {
+  width: 100%; /* Chiều rộng tối đa */
+  max-width: 100vw; /* Không vượt quá chiều rộng màn hình */
+  position: relative;
+  overflow: hidden; /* Cắt bỏ phần ảnh thừa tràn ra ngoài */
+  margin: 0; /* Bỏ khoảng cách thừa */
+  padding: 0;
+  background: #000; /* Nền đen lót dưới */
+}
+
+/* 3. Dải chứa các ảnh (QUAN TRỌNG) */
+.slides-wrapper {
+  display: flex; /* Xếp hàng ngang */
+  width: 100%;
+  transition: transform 0.5s ease-in-out; /* Hiệu ứng trượt */
+}
+
+/* 4. Từng khối slide (ĐÂY LÀ CHỖ SỬA LỖI CỦA BẠN) */
+.slide {
+  width: 100%; /* Chiều rộng 100% */
+
+  /* Dòng dưới này là CHÌA KHÓA để fix lỗi hiển thị nửa nọ nửa kia */
+  flex: 0 0 100%;
+  /* Giải thích: 
+       0: không co lại
+       0: không giãn ra
+       100%: kích thước cứng là 100% khung hình
+    */
+
+  margin: 0;
+  padding: 0;
+}
+
+/* 5. Ảnh trong slide */
+.slide img {
+  width: 100%; /* Luôn rộng 100% */
+  display: block; /* Loại bỏ khoảng trắng dưới chân ảnh */
+  height: auto; /* Chiều cao tự động để ảnh không bị méo */
+
+  /* Nếu bạn muốn giới hạn chiều cao (ví dụ max 650px) thì mở dòng dưới ra, 
+       nhưng coi chừng ảnh bị cắt nếu dùng object-fit */
+  /* max-height: 650px; */
+  /* object-fit: cover; */
+}
+
+/* --- CÁC NÚT BẤM (GIỮ NGUYÊN) --- */
+.prev-btn,
+.next-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: rgba(0, 0, 0, 0.3);
+  color: white;
+  border: none;
+  padding: 15px 20px;
+  cursor: pointer;
+  font-size: 24px;
+  z-index: 10;
+  transition: 0.3s;
+  border-radius: 50%;
+}
+
+.prev-btn:hover,
+.next-btn:hover {
+  background-color: #ff6600;
+}
+
+.prev-btn {
+  left: 20px;
+}
+.next-btn {
+  right: 20px;
+}
+
+/* --- DẤU CHẤM (DOTS) --- */
+.dots-container {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 10px;
+  z-index: 10;
+}
+
+.dot {
+  height: 12px;
+  width: 12px;
+  background-color: rgba(255, 255, 255, 0.5);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.dot.active,
+.dot:hover {
+  background-color: #ff6600;
+  transform: scale(1.3);
+}
+
+/* --- MOBILE: Chỉnh lại một chút cho điện thoại --- */
+@media (max-width: 768px) {
+  .slide img {
+    height: 200px; /* Ép chiều cao trên điện thoại */
+    object-fit: cover; /* Cắt bớt 2 bên để ảnh không bị bé tí */
+  }
 }
