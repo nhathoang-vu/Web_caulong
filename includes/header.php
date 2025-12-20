@@ -74,14 +74,14 @@
             <li class="menu-item">
 <a href="#">Hướng dẫn <i class="fa-solid fa-chevron-down"></i></a>
                 <ul class="sub-menu">
-                    <li><a href="#">Hướng dẫn thanh toán</a></li>
-                    <li><a href="#">Hướng dẫn mua hàng</a></li>
-                    <li><a href="#">Hướng dẫn chọn vợt cầu lông</a></li>
+                    <li><a href="hdtt.php">Hướng dẫn thanh toán</a></li>
+                    <li><a href="hdmh.php">Hướng dẫn mua hàng</a></li>
+                    <li><a href="hdlcvot.php">Hướng dẫn chọn vợt cầu lông</a></li>
                 </ul>
             </li>
 
-            <li class="menu-item"><a href="#">Giới thiệu</a></li>
-            <li class="menu-item"><a href="#">Liên hệ</a></li>
+            <li class="menu-item"><a href="gioithieu.php">Giới thiệu</a></li>
+            <li class="menu-item"><a href="lienhe.php">Liên hệ</a></li>
 
         </ul>
     </div>

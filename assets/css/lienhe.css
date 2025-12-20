@@ -1,0 +1,114 @@
+/* CSS RIÊNG CHO TRANG LIÊN HỆ (Để giống ảnh mẫu) */
+        
+        /* 1. Breadcrumb (Trang chủ > Liên hệ) */
+        .breadcrumb {
+            background-color: #f5f5f5;
+            padding: 10px 0;
+            margin-bottom: 30px;
+        }
+        .breadcrumb .container {
+            font-size: 14px;
+            color: #333;
+        }
+        .breadcrumb a {
+            color: #333;
+            text-decoration: none;
+        }
+        .breadcrumb span {
+            color: #e65100; /* Màu cam cho trang hiện tại */
+            font-weight: 500;
+        }
+
+        /* 2. Container nội dung */
+        .contact-page {
+            max-width: 800px; /* Giới hạn chiều rộng cho gọn như ảnh */
+            margin: 0 auto 50px auto;
+            padding: 0 15px;
+            font-family: Arial, sans-serif;
+        }
+
+        /* 3. Phần thông tin liên hệ phía trên */
+        .contact-info h2 {
+            font-size: 18px;
+            font-weight: bold;
+            text-transform: uppercase;
+            color: #333;
+            margin-bottom: 15px;
+        }
+        .contact-info p {
+            margin-bottom: 10px;
+            font-size: 15px;
+            color: #333;
+        }
+        .contact-info strong {
+            font-weight: bold;
+        }
+        .highlight-text {
+            color: #f39c12; /* Màu vàng cam giống ảnh */
+            font-weight: 500;
+        }
+
+        /* 4. Form liên hệ */
+        .contact-form-title {
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-size: 16px;
+            font-weight: bold;
+            text-transform: uppercase;
+            color: #333;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 20px; /* Khoảng cách giữa Họ tên và Email */
+            margin-bottom: 15px;
+        }
+
+        .form-group {
+            flex: 1; /* Chia đều độ rộng */
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            outline: none;
+            box-sizing: border-box; /* Đảm bảo padding không làm vỡ khung */
+        }
+
+        .form-control:focus {
+            border-color: #333;
+        }
+
+        textarea.form-control {
+            height: 120px;
+            resize: vertical;
+            font-family: Arial, sans-serif;
+        }
+
+        /* 5. Nút bấm */
+        .btn-submit {
+            background-color: #034b75; /* Màu xanh đậm giống ảnh */
+            color: #fff;
+            border: none;
+            padding: 10px 25px;
+            font-size: 14px;
+            border-radius: 4px;
+            cursor: pointer;
+            text-transform: uppercase;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        .btn-submit:hover {
+            background-color: #023858;
+        }
+
+        /* Responsive cho mobile */
+        @media (max-width: 600px) {
+            .form-row {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
