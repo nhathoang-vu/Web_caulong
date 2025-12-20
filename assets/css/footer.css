@@ -1,0 +1,234 @@
+/* =======================================================
+   FILE: assets/css/footer.css - VERSION FINAL (PILL EFFECT)
+   ======================================================= */
+
+/* --- 1. THIẾT LẬP CHUNG FOOTER --- */
+:root {
+    --primary-color: #e65100;
+    --primary-gradient: linear-gradient(135deg, #ff6f00, #e65100);
+    --bg-dark: #111111;
+    --text-grey: #a0a0a0;
+    --text-white: #ffffff;
+}
+
+.site-footer {
+    background-color: var(--bg-dark);
+    color: var(--text-grey);
+    padding-top: 70px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px;
+    position: relative;
+    overflow: hidden;
+}
+
+.site-footer::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: var(--primary-gradient);
+}
+
+.footer-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: grid;
+    grid-template-columns: 2.5fr 1.5fr 1.5fr 2.5fr;
+    gap: 40px;
+}
+
+/* --- 2. TYPOGRAPHY --- */
+.footer-col h3 {
+    color: var(--text-white);
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 30px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    display: inline-block;
+    position: relative;
+}
+.footer-col h3::after {
+    content: '';
+    display: block;
+    width: 100%;
+    height: 2px;
+    background: var(--primary-color);
+    margin-top: 8px;
+    transform: scaleX(0.3);
+    transform-origin: left;
+    transition: transform 0.3s ease;
+}
+.footer-col:hover h3::after { transform: scaleX(1); }
+
+.footer-col p { line-height: 1.8; margin-bottom: 20px; font-weight: 400; }
+
+/* --- 3. LINKS --- */
+.footer-col ul { list-style: none; padding: 0; margin: 0; }
+.footer-col ul li { margin-bottom: 12px; }
+.footer-col ul li a {
+    color: var(--text-grey);
+    text-decoration: none;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+}
+.footer-col ul li a i {
+    font-size: 10px; margin-right: 8px; opacity: 0;
+    transform: translateX(-5px); transition: all 0.3s ease;
+    color: var(--primary-color);
+}
+.footer-col ul li a:hover { color: var(--text-white); transform: translateX(5px); }
+.footer-col ul li a:hover i { opacity: 1; transform: translateX(0); }
+
+/* --- 4. CONTACT INFO --- */
+.contact-item { display: flex; align-items: flex-start; margin-bottom: 20px; gap: 15px; }
+.icon-box {
+    width: 35px; height: 35px; background: #1a1a1a;
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    color: var(--primary-color); flex-shrink: 0; transition: 0.3s;
+}
+.contact-item:hover .icon-box { background: var(--primary-color); color: #fff; }
+
+/* --- 5. FORM & SOCIAL --- */
+.newsletter-form { position: relative; margin-top: 20px; }
+.newsletter-form input {
+    width: 100%; padding: 15px 20px; padding-right: 50px;
+    background: #1a1a1a; border: 1px solid #333; color: #fff;
+    border-radius: 30px; outline: none; transition: 0.3s;
+}
+.newsletter-form input:focus { border-color: var(--primary-color); background: #222; }
+.newsletter-form button {
+    position: absolute; right: 5px; top: 5px; height: 40px; width: 40px;
+    background: var(--primary-gradient); border: none; border-radius: 50%;
+    color: #fff; cursor: pointer; transition: 0.3s; display: flex;
+    align-items: center; justify-content: center;
+}
+.newsletter-form button:hover { transform: scale(1.1); }
+
+.social-links { display: flex; gap: 15px; margin-top: 25px; }
+.social-btn {
+    width: 40px; height: 40px; border-radius: 8px; background: #1a1a1a;
+    color: #fff; display: flex; align-items: center; justify-content: center;
+    transition: all 0.3s ease; border: 1px solid #333;
+}
+.social-btn:hover {
+    background: var(--primary-color); border-color: var(--primary-color);
+    transform: translateY(-5px);
+}
+
+.footer-bottom {
+    background: #0a0a0a; padding: 25px 0; margin-top: 60px;
+    border-top: 1px solid #222; text-align: center; font-size: 13px; color: #666;
+}
+
+/* RESPONSIVE FOOTER */
+@media (max-width: 992px) { .footer-container { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 576px) { .footer-container { grid-template-columns: 1fr; gap: 30px; } }
+
+
+/* =======================================================
+   8. NÚT NỔI HIỆU ỨNG KÉO DÀI (PILL SHAPE)
+   ======================================================= */
+
+/* CẤU TRÚC CHUNG */
+.float-group-left, 
+.float-group-right {
+    position: fixed;
+    bottom: 30px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column-reverse; /* Nút chính dưới cùng */
+    gap: 15px;
+    align-items: flex-end; /* Mặc định căn phải */
+}
+
+/* Vị trí */
+.float-group-left { 
+    left: 25px; 
+    align-items: flex-start; /* Nhóm trái căn trái */
+}
+.float-group-right { right: 25px; }
+
+/* STYLE NÚT (HÌNH TRÒN -> VIÊN THUỐC) */
+.float-btn {
+    height: 50px;
+    min-width: 50px; /* Hình tròn khi chưa hover */
+    border-radius: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    text-decoration: none;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    border: 2px solid rgba(255,255,255,0.2);
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    overflow: hidden;
+    background-size: 200% auto;
+}
+
+.float-btn img { width: 26px; height: 26px; object-fit: contain; flex-shrink: 0; }
+.float-btn i { font-size: 20px; flex-shrink: 0; }
+
+/* PHẦN CHỮ (TEXT) - Mặc định ẩn */
+.float-text {
+    font-size: 13px;
+    font-weight: 700;
+    white-space: nowrap;
+    max-width: 0;        /* Ẩn bằng width */
+    opacity: 0;
+    transition: all 0.4s ease;
+    margin: 0;
+}
+
+/* HIỆU ỨNG HOVER: KÉO DÀI RA */
+.float-btn:hover {
+    padding: 0 20px; /* Thêm padding 2 đầu */
+    box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+}
+
+.float-btn:hover .float-text {
+    max-width: 150px; /* Mở rộng chiều rộng */
+    opacity: 1;
+}
+
+/* --- TÙY CHỈNH HƯỚNG MỞ RỘNG --- */
+
+/* Nhóm TRÁI: Text hiện bên Phải (Icon - Text) */
+.float-group-left .float-btn:hover .float-text { margin-left: 10px; }
+
+/* Nhóm PHẢI: Text hiện bên Trái (Text - Icon) */
+.float-group-right .float-btn { flex-direction: row-reverse; } /* Đảo icon sang phải */
+.float-group-right .float-btn:hover .float-text { margin-right: 10px; }
+
+
+/* --- MÀU SẮC --- */
+.float-btn.phone { 
+    background: linear-gradient(135deg, #ff6f00, #e65100); 
+    animation: phone-pulse 2s infinite;
+}
+.float-btn.zalo { background: linear-gradient(135deg, #0068ff, #0041a3); }
+.float-btn.messenger { background: linear-gradient(135deg, #00B2FF, #006AFF); }
+
+/* Back to Top */
+.float-btn.back-to-top {
+    background: #222; border-color: #444;
+    opacity: 0; visibility: hidden; transform: translateY(20px);
+}
+.float-btn.back-to-top.show {
+    opacity: 1; visibility: visible; transform: translateY(0);
+}
+.float-btn.back-to-top:hover { background: #000; border-color: #e65100; }
+
+@keyframes phone-pulse {
+    0% { box-shadow: 0 0 0 0 rgba(230, 81, 0, 0.7); }
+    70% { box-shadow: 0 0 0 10px rgba(230, 81, 0, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(230, 81, 0, 0); }
+}
+
+/* MOBILE: Tắt hiệu ứng kéo dài để gọn */
+@media (max-width: 768px) {
+    .float-btn:hover { padding: 0; width: 50px; }
+    .float-btn:hover .float-text { display: none; }
+}

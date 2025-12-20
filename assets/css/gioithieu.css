@@ -1,198 +1,198 @@
+/* =======================================================
+   FILE: assets/css/gioithieu.css - FINAL VERSION
+   ======================================================= */
 
-        .breadcrumb {
-            background-color: #f5f5f5;
-            padding: 10px 0;
-            margin-bottom: 30px;
-        }
-        .breadcrumb .container {
-            font-size: 14px;
-            color: #333;
-        }
-        .breadcrumb a {
-            color: #333;
-            text-decoration: none;
-        }
-        .breadcrumb span {
-            color: #e65100;
-            font-weight: 500;
-        }
+/* --- 1. PHẦN BREADCRUMB & LAYOUT CHUNG --- */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap');
 
-        /* 2. Layout chia 2 cột */
-        .intro-container {
-            display: flex;
-            gap: 30px;
-            max-width: 1200px;
-            margin: 0 auto 50px auto;
-            padding: 0 15px;
-            align-items: flex-start; /* Để sidebar không bị kéo dài xuống */
-        }
-
-        /* Cột bên trái (Sidebar) */
-        .sidebar {
-            width: 30%;
-            border-right: 1px solid #eee; /* Đường kẻ mờ ngăn cách */
-            padding-right: 20px;
-        }
-
-        .sidebar h3 {
-            font-size: 16px;
-            font-weight: bold;
-            text-transform: uppercase;
-            margin-bottom: 20px;
-            border-bottom: 2px solid #333;
-            display: inline-block;
-            padding-bottom: 5px;
-        }
-
-        .news-item {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            border-bottom: 1px solid #f1f1f1;
-            padding-bottom: 10px;
-        }
-
-        .news-thumb {
-            width: 80px;
-            height: 60px;
-            background-color: #eee;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #999;
-            font-size: 20px;
-            border-radius: 4px;
-        }
-        
-        .news-info a {
-            font-size: 14px;
-            color: #333;
-            font-weight: 500;
-            text-decoration: none;
-            display: -webkit-box;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-        .news-info a:hover {
-            color: #e65100;
-        }
-        .news-date {
-            font-size: 12px;
-            color: #999;
-            margin-top: 5px;
-        }
-
-        /* Cột bên phải (Nội dung chính) */
-        .main-content {
-            width: 70%;
-        }
-
-        .main-content h1 {
-            font-size: 24px;
-            font-weight: bold;
-            text-transform: uppercase;
-            margin-bottom: 10px;
-            color: #333;
-        }
-
-        .meta-info {
-            font-size: 13px;
-            color: #888;
-            margin-bottom: 20px;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 15px;
-        }
-        .meta-info i { margin-right: 5px; }
-        .meta-info span { margin-right: 15px; }
-
-        .content-text {
-            font-family: Arial, sans-serif;
-            font-size: 15px;
-            line-height: 1.6;
-            color: #333;
-            text-align: justify;
-        }
-        
-        .content-text p { margin-bottom: 15px; }
-        .content-text strong { color: #000; }
-        
-        .highlight { color: #e65100; font-weight: bold; }
-
-        /* Responsive Mobile */
-        @media (max-width: 768px) {
-            .intro-container {
-                flex-direction: column-reverse; /* Đảo ngược để nội dung lên trên, sidebar xuống dưới */
-            }
-            .sidebar, .main-content {
-                width: 100%;
-                border-right: none;
-            }
-        }
-        /* --- CSS CHO PHẦN ĐỘI NGŨ SÁNG LẬP --- */
-
-.founders-section {
-    margin-top: 50px;
-    padding-top: 30px;
-    border-top: 2px solid #eee;
-    width: 100%; /* Đảm bảo khung bao ngoài rộng 100% */
+body {
+    font-family: 'Roboto', Arial, sans-serif !important;
+    color: #333;
+    line-height: 1.6;
+    background-color: #fff;
 }
 
-.founders-section h2 {
-    font-size: 22px;
+/* --- HIỆU ỨNG ĐỔ BÓNG CHỮ (TEXT SHADOW) --- */
+h1, h2, h3 {
+    font-family: 'Roboto', Arial, sans-serif;
+    font-weight: 700;
+    color: #333;
+    margin: 0 0 15px 0;
+    line-height: 1.3;
+    /* Bóng đổ nhẹ màu xám giúp chữ nổi bật */
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.15); 
+}
+.breadcrumb {
+    background-color: #f5f5f5;
+    padding: 10px 0;
+    margin-bottom: 30px;
+}
+.breadcrumb .container { font-size: 14px; color: #333; }
+.breadcrumb a { color: #333; text-decoration: none; }
+.breadcrumb span { color: #e65100; font-weight: 500; }
+
+/* Layout chia 2 cột (Sidebar - Main) */
+.intro-container {
+    display: flex;
+    gap: 30px;
+    max-width: 1200px;
+    margin: 0 auto 50px auto;
+    padding: 0 15px;
+    align-items: flex-start;
+}
+
+/* Sidebar bên trái */
+.sidebar {
+    width: 30%;
+    border-right: 1px solid #eee;
+    padding-right: 20px;
+}
+.sidebar h3 {
+    font-size: 16px;
     font-weight: bold;
     text-transform: uppercase;
-    margin-bottom: 30px;
-    color: #333;
-    text-align: center;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #333;
+    display: inline-block;
+    padding-bottom: 5px;
 }
 
-.founders-grid {
+.news-item {
     display: flex;
-    justify-content: space-between; /* QUAN TRỌNG: Đẩy phần tử ra 2 đầu và giữa */
-    width: 100%;                    /* Tràn hết chiều rộng */
-    gap: 0;                         /* Để space-between tự tính khoảng cách */
+    gap: 10px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #f1f1f1;
+    padding-bottom: 10px;
+}
+.news-thumb {
+    width: 80px; height: 60px; background-color: #eee;
+    display: flex; align-items: center; justify-content: center;
+    color: orangered; font-size: 20px; border-radius: 4px;
+}
+.news-info a {
+    font-size: 14px; color: #333; font-weight: 500;
+    text-decoration: none; display: block;
+}
+.news-info a:hover { color: #e65100; }
+.news-date { font-size: 12px; color: #999; margin-top: 5px; }
+
+/* Nội dung chính bên phải */
+.main-content { width: 70%; }
+.main-content h1 {
+    font-size: 24px; font-weight: bold; text-transform: uppercase;
+    margin-bottom: 10px; color: #333;
+}
+.meta-info {
+    font-size: 13px; color: #888; margin-bottom: 20px;
+    border-bottom: 1px solid #eee; padding-bottom: 15px;
+}
+.meta-info i { margin-right: 5px; }
+.meta-info span { margin-right: 15px; }
+
+.content-text {
+    font-family: Arial, sans-serif; font-size: 15px;
+    line-height: 1.6; color: #333; text-align: justify;
+}
+.content-text p { margin-bottom: 15px; }
+.content-text strong { color: #000; }
+.highlight { color: #e65100; font-weight: bold; }
+
+/* --- 2. PHẦN ĐỘI NGŨ CHUYÊN GIA (FOUNDERS) --- */
+.founders-section {
+    max-width: 1200px;
+    margin: 60px auto;
+    padding: 0 15px;
+    text-align: center;
+}
+.founders-section h2 {
+    font-size: 28px; font-weight: 800; text-transform: uppercase;
+    margin-bottom: 40px; color: #e65100; position: relative; display: inline-block;
+}
+.founders-section h2::after {
+    content: ''; display: block; width: 60px; height: 4px;
+    background: #e65100; margin: 10px auto 0; border-radius: 2px;
+}
+
+/* LƯỚI 4 CỘT (ÉP CỨNG ĐỂ KHÔNG RỚT DÒNG) */
+.founders-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* 4 Cột đều nhau */
+    gap: 20px;
 }
 
 .founder-card {
-    width: 32%; /* Chia 3 cột: Mỗi cột chiếm ~32%, phần dư còn lại là khoảng trống */
-    text-align: center;
-    background: #f9f9f9;
-    padding: 20px 10px; /* Padding trên dưới 20, trái phải 10 cho gọn */
-    border-radius: 8px;
-    box-sizing: border-box; /* Đảm bảo padding không làm vỡ khung */
+    background: #fff; padding: 25px 15px;
+    border-radius: 15px; border: 1px solid #eee;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+    transition: all 0.3s ease; position: relative; overflow: hidden;
+    height: 100%; /* Giúp các thẻ cao bằng nhau */
 }
-
+.founder-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 30px rgba(230, 81, 0, 0.15);
+    border-color: #e65100;
+}
 .founder-img {
-    width: 120px;
-    height: 120px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 3px solid #e65100;
-    margin-bottom: 15px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    width: 130px; height: 130px; border-radius: 50%;
+    object-fit: cover; border: 4px solid #fff;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    margin-bottom: 20px; transition: 0.3s;
+}
+.founder-card:hover .founder-img { transform: scale(1.05); border-color: #e65100; }
+.founder-name { font-size: 16px; font-weight: 700; color: #333; margin-bottom: 5px; text-transform: uppercase; }
+.founder-role { font-size: 13px; color: #e65100; font-weight: 600; margin-bottom: 10px; }
+.founder-desc { font-size: 13px; color: #666; line-height: 1.5; font-style: italic; }
+
+/* --- 3. PHẦN GIÁ TRỊ CỐT LÕI (WHY CHOOSE US) --- */
+.core-values {
+    background: #fff8f0; padding: 60px 0; margin-top: 60px;
+}
+.values-container {
+    max-width: 1200px; margin: 0 auto; padding: 0 15px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* 4 Cột đều nhau */
+    gap: 20px;
+}
+.value-box {
+    text-align: center; padding: 20px;
+    transition: all 0.3s ease;
+    border: 1px solid transparent; /* Tránh giật khi hover */
+    border-radius: 10px;
+}
+/* Hiệu ứng hover cho cả hộp giá trị */
+.value-box:hover {
+    transform: translateY(-5px);
+    background: #fff;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    border-color: #e65100;
+}
+.value-icon { font-size: 40px; color: #e65100; margin-bottom: 15px; }
+.value-title { font-weight: 700; font-size: 16px; margin-bottom: 10px; text-transform: uppercase; }
+.value-text { font-size: 13px; color: #666; }
+
+/* --- 4. ANIMATION ICON --- */
+/* Kim cương */
+.value-box:hover .fa-gem { animation: diamond-spin 1s ease-in-out; color: #ffd700; }
+@keyframes diamond-spin { 50% { transform: rotate(180deg) scale(1.2); } 100% { transform: rotate(360deg) scale(1); } }
+/* Xe tải */
+.value-box:hover .fa-truck-fast { animation: truck-run 1s ease-in-out; color: #e65100; }
+@keyframes truck-run { 0% { transform: translateX(0); } 30% { transform: translateX(30px) skewX(-10deg); opacity: 0.7; } 31% { opacity: 0; transform: translateX(-30px); } 60% { opacity: 1; transform: translateX(-5px); } 100% { transform: translateX(0); } }
+/* Đổi trả */
+.value-box:hover .fa-rotate { animation: rotate-circle 0.8s linear; }
+@keyframes rotate-circle { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+/* Cờ lê */
+.value-box:hover .fa-screwdriver-wrench { animation: wrench-shake 0.8s ease-in-out; transform-origin: center; }
+@keyframes wrench-shake { 0%, 100% { transform: rotate(0deg); } 20% { transform: rotate(-25deg); } 40% { transform: rotate(25deg); } 60% { transform: rotate(-15deg); } 80% { transform: rotate(15deg); } }
+
+/* --- 5. RESPONSIVE --- */
+@media (max-width: 992px) {
+    /* Tablet: 2 Cột */
+    .founders-grid, .values-container { grid-template-columns: repeat(2, 1fr); }
 }
 
-.founder-name {
-    font-size: 16px;
-    font-weight: bold;
-    color: #333;
-    margin-bottom: 5px;
-    text-transform: uppercase;
-}
-
-.founder-role {
-    font-size: 13px;
-    color: #e65100;
-    font-weight: 600;
-}
-
-/* Mobile: Xếp chồng lên nhau */
-@media (max-width: 600px) {
-    .founders-grid {
-        flex-direction: column;
-        gap: 20px;
-    }
-    .founder-card {
-        width: 100%; /* Trên điện thoại thì full màn hình */
-    }
+@media (max-width: 768px) {
+    /* Mobile: 1 Cột, Sidebar đẩy xuống dưới */
+    .intro-container { flex-direction: column-reverse; }
+    .sidebar, .main-content { width: 100%; border-right: none; }
+    .founders-grid, .values-container { grid-template-columns: 1fr; }
 }

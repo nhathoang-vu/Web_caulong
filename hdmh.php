@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="assets/css/style.css">
     <link rel="stylesheet" href="assets/css/menu.css">
+      <link rel="stylesheet" href="assets/css/footer.css">
     <style>
         .guide-container { display: flex; gap: 30px; max-width: 1200px; margin: 30px auto; padding: 0 15px; }
         .sidebar-guide { width: 25%; border-right: 1px solid #eee; }
@@ -30,7 +31,7 @@
         <aside class="sidebar-guide">
             <h3>Danh mục hướng dẫn</h3>
             <ul>
-                <li><a href="hdtmh.php" class="active"><i class="fa-solid fa-cart-shopping"></i> Hướng dẫn mua hàng</a></li>
+                <li><a href="hdmh.php" class="active"><i class="fa-solid fa-cart-shopping"></i> Hướng dẫn mua hàng</a></li>
                 <li><a href="hdtt.php"><i class="fa-solid fa-money-bill"></i> Hướng dẫn thanh toán</a></li>
                 <li><a href="hdlcvot.php"><i class="fa-solid fa-table-tennis-paddle-ball"></i> Hướng dẫn chọn vợt</a></li>
             </ul>
