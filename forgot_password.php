@@ -59,6 +59,7 @@
     <link rel="stylesheet" href="assets/css/login.css">
     <link rel="stylesheet" href="assets/css/menu.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/footer.css">
     
     <style>
         /* Thêm chút CSS hiển thị thông báo lỗi ngay tại trang này */

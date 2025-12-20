@@ -11,7 +11,7 @@
                 <i class="fa-solid fa-headset icon-orange"></i>
                 <div class="info-text">
                     <span class="label">HOTLINE:</span>
-                    <span class="highlight">0977.508.430</span>
+                    <span class="highlight">0904082576</span>
                 </div>
             </div>
             

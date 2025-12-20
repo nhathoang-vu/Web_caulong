@@ -1,114 +1,255 @@
-/* CSS RIÊNG CHO TRANG LIÊN HỆ (Để giống ảnh mẫu) */
-        
-        /* 1. Breadcrumb (Trang chủ > Liên hệ) */
-        .breadcrumb {
-            background-color: #f5f5f5;
-            padding: 10px 0;
-            margin-bottom: 30px;
-        }
-        .breadcrumb .container {
-            font-size: 14px;
-            color: #333;
-        }
-        .breadcrumb a {
-            color: #333;
-            text-decoration: none;
-        }
-        .breadcrumb span {
-            color: #e65100; /* Màu cam cho trang hiện tại */
-            font-weight: 500;
-        }
+/* =======================================================
+   FILE: assets/css/lienhe.css - FINAL ANIMATED VERSION
+   ======================================================= */
 
-        /* 2. Container nội dung */
-        .contact-page {
-            max-width: 800px; /* Giới hạn chiều rộng cho gọn như ảnh */
-            margin: 0 auto 50px auto;
-            padding: 0 15px;
-            font-family: Arial, sans-serif;
-        }
+/* 1. NHÚNG FONT ROBOTO */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap');
 
-        /* 3. Phần thông tin liên hệ phía trên */
-        .contact-info h2 {
-            font-size: 18px;
-            font-weight: bold;
-            text-transform: uppercase;
-            color: #333;
-            margin-bottom: 15px;
-        }
-        .contact-info p {
-            margin-bottom: 10px;
-            font-size: 15px;
-            color: #333;
-        }
-        .contact-info strong {
-            font-weight: bold;
-        }
-        .highlight-text {
-            color: #f39c12; /* Màu vàng cam giống ảnh */
-            font-weight: 500;
-        }
+/* --- BẢO VỆ ICON KHỎI LỖI FONT (QUAN TRỌNG) --- */
+.fa, .fas, .fa-solid, .far, .fa-regular {
+    font-family: "Font Awesome 6 Free" !important;
+    font-weight: 900;
+}
+.fab, .fa-brands {
+    font-family: "Font Awesome 6 Brands" !important;
+    font-weight: 400;
+}
 
-        /* 4. Form liên hệ */
-        .contact-form-title {
-            margin-top: 30px;
-            margin-bottom: 15px;
-            font-size: 16px;
-            font-weight: bold;
-            text-transform: uppercase;
-            color: #333;
-        }
+/* 2. THIẾT LẬP BODY & KEYFRAMES ANIMATION */
+body {
+    font-family: 'Roboto', Arial, sans-serif; 
+    background-color: #f8f9fa;
+    color: #333;
+    margin: 0;
+    padding: 0;
+    line-height: 1.6;
+    overflow-x: hidden; /* Tránh thanh cuộn ngang khi animation chạy */
+}
 
-        .form-row {
-            display: flex;
-            gap: 20px; /* Khoảng cách giữa Họ tên và Email */
-            margin-bottom: 15px;
-        }
+/* --- ĐỊNH NGHĨA HIỆU ỨNG BAY LÊN (FadeInUp) --- */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translate3d(0, 40px, 0); /* Bắt đầu ở dưới thấp 40px */
+    }
+    to {
+        opacity: 1;
+        transform: translate3d(0, 0, 0); /* Về vị trí chuẩn */
+    }
+}
 
-        .form-group {
-            flex: 1; /* Chia đều độ rộng */
-        }
+/* --- TIÊU ĐỀ H1 --- */
+.contact-container {
+    max-width: 1200px;
+    margin: 50px auto;
+    padding: 0 20px;
+}
 
-        .form-control {
-            width: 100%;
-            padding: 10px 15px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 14px;
-            outline: none;
-            box-sizing: border-box; /* Đảm bảo padding không làm vỡ khung */
-        }
+.contact-container h1 {
+    text-align: center;
+    font-size: 32px;
+    font-weight: 900;
+    color: #e65100;
+    margin-bottom: 50px;
+    text-transform: uppercase;
+    text-shadow: 2px 2px 0px rgba(230, 81, 0, 0.15); 
+    position: relative;
+    display: inline-block;
+    width: 100%;
+    font-family: 'Roboto', sans-serif !important;
+    
+    /* Animation cho tiêu đề: Hiện ra đầu tiên */
+    animation: fadeInUp 0.8s ease-out forwards;
+}
 
-        .form-control:focus {
-            border-color: #333;
-        }
+.contact-container h1::after {
+    content: ''; display: block; width: 80px; height: 4px;
+    background: #e65100; margin: 15px auto 0; border-radius: 2px;
+    box-shadow: 0 2px 5px rgba(230, 81, 0, 0.3);
+}
 
-        textarea.form-control {
-            height: 120px;
-            resize: vertical;
-            font-family: Arial, sans-serif;
-        }
+/* --- 3 Ô THÔNG TIN (INFO BOX) --- */
+.contact-info {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+    margin-bottom: 60px;
+}
 
-        /* 5. Nút bấm */
-        .btn-submit {
-            background-color: #034b75; /* Màu xanh đậm giống ảnh */
-            color: #fff;
-            border: none;
-            padding: 10px 25px;
-            font-size: 14px;
-            border-radius: 4px;
-            cursor: pointer;
-            text-transform: uppercase;
-            font-weight: bold;
-            margin-top: 10px;
-        }
-        .btn-submit:hover {
-            background-color: #023858;
-        }
+.info-box {
+    background: #fff;
+    padding: 35px 20px;
+    border-radius: 15px;
+    text-align: center;
+    border: 1px solid #eee;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Hiệu ứng nhún khi hover */
+    
+    /* Animation: Mặc định ẩn, chờ hiệu ứng */
+    opacity: 0; 
+    animation: fadeInUp 0.8s ease-out forwards;
+}
 
-        /* Responsive cho mobile */
-        @media (max-width: 600px) {
-            .form-row {
-                flex-direction: column;
-                gap: 15px;
-            }
-        }
+/* --- Kỹ thuật Stagger (Xuất hiện lần lượt) --- */
+.info-box:nth-child(1) { animation-delay: 0.2s; } /* Ô 1 trễ 0.2s */
+.info-box:nth-child(2) { animation-delay: 0.4s; } /* Ô 2 trễ 0.4s */
+.info-box:nth-child(3) { animation-delay: 0.6s; } /* Ô 3 trễ 0.6s */
+
+.info-box:hover {
+    transform: translateY(-10px) scale(1.02); /* Phóng to nhẹ khi hover */
+    box-shadow: 0 15px 30px rgba(230, 81, 0, 0.15); /* Bóng màu cam nhạt */
+    border-color: #e65100;
+}
+
+/* Icon trong ô thông tin */
+.info-box i {
+    font-size: 45px;
+    color: #e65100;
+    margin-bottom: 20px;
+    filter: drop-shadow(2px 4px 2px rgba(230, 81, 0, 0.2));
+    font-family: "Font Awesome 6 Free" !important; 
+    transition: transform 0.5s;
+}
+
+.info-box:hover i {
+    transform: rotateY(180deg); /* Xoay icon 3D khi hover */
+}
+
+.info-box h3 {
+    font-size: 18px;
+    margin-bottom: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #333;
+    font-family: 'Roboto', sans-serif;
+}
+
+.info-box p {
+    color: #666;
+    font-size: 15px;
+    line-height: 1.6;
+    font-weight: 500;
+}
+
+/* --- FORM & MAP WRAPPER --- */
+.contact-content-wrapper {
+    display: flex;
+    gap: 30px;
+    align-items: stretch;
+}
+
+/* --- ANIMATION CHO FORM & MAP --- */
+.contact-form-container, 
+.map-container {
+    opacity: 0; /* Ẩn trước khi chạy animation */
+    animation: fadeInUp 1s ease-out forwards;
+}
+
+.contact-form-container {
+    flex: 1;
+    background: #fff;
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+    border: 1px solid #f0f0f0;
+    animation-delay: 0.8s; /* Xuất hiện sau các ô thông tin */
+}
+
+.map-container {
+    flex: 1;
+    background: #fff;
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+    border: 1px solid #f0f0f0;
+    display: flex;
+    flex-direction: column;
+    animation-delay: 1.0s; /* Xuất hiện cuối cùng */
+}
+
+.contact-form-container h3, 
+.map-container h3 {
+    font-size: 22px;
+    color: #333;
+    margin-bottom: 30px;
+    font-weight: 800;
+    text-align: center;
+    text-transform: uppercase;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+    font-family: 'Roboto', sans-serif;
+}
+
+.form-group { margin-bottom: 20px; }
+
+.form-control {
+    width: 100%;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-family: 'Roboto', sans-serif !important;
+    font-size: 14px;
+    transition: all 0.3s;
+    background: #fdfdfd;
+}
+
+/* Hiệu ứng focus Input: Nở ra nhẹ và đổi màu viền */
+.form-control:focus {
+    outline: none;
+    border-color: #e65100;
+    box-shadow: 0 0 15px rgba(230, 81, 0, 0.2);
+    background: #fff;
+    transform: scale(1.01);
+}
+
+textarea.form-control { resize: vertical; height: 150px; }
+
+.btn-submit {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, #ff6f00, #e65100);
+    background-size: 200% auto; /* Chuẩn bị cho hiệu ứng hover gradient */
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 700;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: 0.4s;
+    box-shadow: 0 4px 10px rgba(230, 81, 0, 0.3);
+    font-family: 'Roboto', sans-serif;
+}
+
+.btn-submit:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(230, 81, 0, 0.4);
+    background-position: right center; /* Chạy màu gradient */
+}
+
+/* --- BẢN ĐỒ --- */
+.map-frame {
+    width: 100%;
+    flex-grow: 1;
+    min-height: 450px;
+    border: none;
+    border-radius: 10px;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
+    transition: 0.3s;
+}
+
+/* Hiệu ứng khi hover vào khung map */
+.map-container:hover .map-frame {
+    filter: saturate(1.2); /* Làm bản đồ rực rỡ hơn chút khi hover */
+}
+
+/* --- RESPONSIVE --- */
+@media (max-width: 992px) {
+     .contact-content-wrapper { flex-direction: column; }
+    .contact-form-container, .map-container { width: 100%; }
+    .map-frame { min-height: 350px; }
+}
+
+@media (max-width: 768px) {
+    .contact-info { grid-template-columns: 1fr; }
+    .contact-container h1 { font-size: 26px; }
+}

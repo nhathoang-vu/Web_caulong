@@ -85,14 +85,14 @@ try {
     <link rel="stylesheet" href="assets/css/style.css">
     <link rel="stylesheet" href="assets/css/menu.css">
     <link rel="stylesheet" href="assets/css/huongdan.css">
-
+    <link rel="stylesheet" href="assets/css/footer.css">
 </head>
 <body>
 
     <?php include 'includes/header.php'; ?>
 
     <div class="guide-container">
-        
+      
        <aside class="sidebar-guide">
     <h3><i class="fa-solid fa-list-ul"></i> &nbsp; DANH MỤC</h3>
     <ul class="category-list">
@@ -125,10 +125,16 @@ try {
             </a>
         </li>
     </ul>
-
+    <h3>Danh mục hướng dẫn</h3>
+            <ul>
+                <li><a href="hdmh.php"><i class="fa-solid fa-cart-shopping"></i> &nbsp; Hướng dẫn mua hàng</a></li>
+                <li><a href="hdtt.php"><i class="fa-solid fa-money-bill"></i> &nbsp; Hướng dẫn thanh toán</a></li>
+                <li><a href="hdlcvot.php" class="active"><i class="fa-solid fa-table-tennis-paddle-ball"></i> &nbsp; Hướng dẫn chọn vợt</a></li>
+            </ul>
     <div class="sidebar-box">
         <h3><i class="fa-solid fa-fire"></i> &nbsp; Bán chạy nhất</h3>
         </div>
+          
 </aside>
 
         <main class="main-guide">

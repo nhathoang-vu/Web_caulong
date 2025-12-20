@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="assets/css/style.css">
     <link rel="stylesheet" href="assets/css/menu.css">
-    
+      <link rel="stylesheet" href="assets/css/footer.css">
     <style>
         /* Bạn copy y hệt đoạn style ở file huongdanmuahang.php dán vào đây */
         .guide-container { display: flex; gap: 30px; max-width: 1200px; margin: 30px auto; padding: 0 15px; }
