@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1
--- Thời gian đã tạo: Th12 18, 2025 lúc 12:10 PM
+-- Thời gian đã tạo: Th12 21, 2025 lúc 07:49 PM
 -- Phiên bản máy phục vụ: 10.4.32-MariaDB
--- Phiên bản PHP: 8.2.12
+-- Phiên bản PHP: 8.0.30
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -103,11 +103,13 @@ CREATE TABLE `sanpham` (
   `danhmuc_id` int(11) NOT NULL COMMENT 'Thuộc danh mục nào',
   `thuonghieu_id` int(11) DEFAULT NULL COMMENT 'Thuộc hãng nào',
   `ten_sanpham` varchar(255) NOT NULL,
+  `gia_nhap` decimal(15,0) DEFAULT 0,
   `hinh_anh` varchar(255) DEFAULT NULL COMMENT 'Ảnh đại diện chính',
   `gia_ban` decimal(10,0) NOT NULL,
   `gia_khuyenmai` decimal(10,0) DEFAULT 0,
-  `thong_so_ky_thuat` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL COMMENT 'Lưu các thông số kỹ thuật riêng biệt' CHECK (json_valid(`thong_so_ky_thuat`)),
-  `mo_ta` text DEFAULT NULL COMMENT 'Bài viết mô tả chi tiết sản phẩm (HTML)',
+  `kich_thuoc` varchar(100) DEFAULT NULL COMMENT 'Chiều dài vợt',
+  `thong_so` varchar(255) DEFAULT NULL COMMENT '3U, 4U, 5U',
+  `mo_ta` longtext DEFAULT NULL,
   `luot_xem` int(11) DEFAULT 0,
   `ngay_tao` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -116,16 +118,14 @@ CREATE TABLE `sanpham` (
 -- Đang đổ dữ liệu cho bảng `sanpham`
 --
 
-INSERT INTO `sanpham` (`id`, `danhmuc_id`, `thuonghieu_id`, `ten_sanpham`, `hinh_anh`, `gia_ban`, `gia_khuyenmai`, `thong_so_ky_thuat`, `mo_ta`, `luot_xem`, `ngay_tao`) VALUES
-(1, 1, 1, 'Vợt Yonex Astrox 77 Pro', 'vot1.jpg', 3200000, 2800000, NULL, NULL, 0, '2025-12-18 01:22:05'),
-(2, 1, 2, 'Vợt Lining Axforce 80', 'vot2.jpg', 4500000, 0, NULL, NULL, 0, '2025-12-18 01:22:05'),
-(3, 2, 5, 'Giày Kawasaki 173', 'giay1.jpg', 950000, 0, NULL, NULL, 0, '2025-12-18 01:22:05'),
-(4, 3, NULL, 'Balo Yonex 2024', 'balo1.jpg', 650000, 0, NULL, NULL, 0, '2025-12-18 01:22:05'),
-(5, 4, 3, 'Áo cầu lông Victor', 'ao1.jpg', 150000, 120000, NULL, NULL, 0, '2025-12-18 01:22:05'),
-(6, 1, 3, 'Vợt Victor Ryuga', 'vot_victor.jpg', 3100000, 0, NULL, NULL, 0, '2025-12-18 02:57:07'),
-(7, 1, 1, 'Vợt Yonex 100ZZ', 'vot_yonex_zz.jpg', 3800000, 0, NULL, NULL, 0, '2025-12-18 02:57:07'),
-(8, 2, 1, 'Giày Yonex 65Z3', 'giay_yonex.jpg', 2600000, 0, NULL, NULL, 0, '2025-12-18 02:57:07'),
-(9, 2, 2, 'Giày Lining AYzs01', 'giay_lining.jpg', 1200000, 0, NULL, NULL, 0, '2025-12-18 02:57:07');
+INSERT INTO `sanpham` (`id`, `danhmuc_id`, `thuonghieu_id`, `ten_sanpham`, `gia_nhap`, `hinh_anh`, `gia_ban`, `gia_khuyenmai`, `kich_thuoc`, `thong_so`, `mo_ta`, `luot_xem`, `ngay_tao`) VALUES
+(1, 1, 1, 'Vợt Yonex Astrox 77 Pro', 2200000, 'vot1.png', 3200000, 2560000, '675mm', '4U', NULL, 0, '2025-12-18 01:22:05'),
+(2, 1, 2, 'Vợt Lining Axforce 80', 3100000, 'vot2.jpg', 4500000, 3600000, '700mm', '5U', NULL, 0, '2025-12-18 01:22:05'),
+(3, 2, 5, 'Giày Kawasaki 173', 650000, 'giay1.jpg', 950000, 760000, '600mm', '3U', NULL, 0, '2025-12-18 01:22:05'),
+(4, 3, NULL, 'Balo Yonex 2024', 400000, 'balo1.jpg', 650000, 520000, NULL, NULL, NULL, 0, '2025-12-18 01:22:05'),
+(7, 1, 1, 'Vợt Yonex 100ZZ', 2600000, 'vot_yonex_zz.jpg', 3800000, 3500000, NULL, NULL, NULL, 0, '2025-12-18 02:57:07'),
+(8, 2, 1, 'Giày Yonex 65Z3', 1800000, 'giay_yonex.jpg', 2600000, 2300000, NULL, NULL, NULL, 0, '2025-12-18 02:57:07'),
+(9, 2, 2, 'Giày Lining AYzs01', 800000, 'giay_lining.jpg', 1200000, 0, NULL, NULL, NULL, 0, '2025-12-18 02:57:07');
 
 -- --------------------------------------------------------
 
@@ -171,7 +171,8 @@ CREATE TABLE `user` (
 
 INSERT INTO `user` (`id`, `name`, `password`, `email`, `sdt`, `quyenhan`) VALUES
 (1, 'bao', '$2y$10$Hbnb7XpSPjyVvVSpt.lseulMWBHekgywTqwXDKPq.iLcZS9z7IVRm', 'bao96219@st.vimaru.edu.vn', '0868149341', 0),
-(2, 'admin', '$2y$10$/4U4.esIObBgiqJFfC51zOAj.dWqdQhUniIqx0jAZeJ1LP1IFmq06', 'baodcad73@gmail.com', '0868149341', 1);
+(2, 'admin', '202cb962ac59075b964b07152d234b70', 'admin@gmail.com', '0868149341', 1),
+(3, 'Thảo', '$2y$10$amk/7Hch.psvHv5F.yXZGuIcVZ4PZhN/3e08n9bHBE2cKN6q/fQOC', 'hucthanhthao198@gmail.com', '0382344082', 0);
 
 --
 -- Chỉ mục cho các bảng đã đổ
@@ -268,7 +269,7 @@ ALTER TABLE `thuonghieu`
 -- AUTO_INCREMENT cho bảng `user`
 --
 ALTER TABLE `user`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- Các ràng buộc cho các bảng đã đổ
