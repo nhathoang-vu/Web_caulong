@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1
--- Thời gian đã tạo: Th12 21, 2025 lúc 07:49 PM
+-- Thời gian đã tạo: Th12 22, 2025 lúc 12:44 PM
 -- Phiên bản máy phục vụ: 10.4.32-MariaDB
--- Phiên bản PHP: 8.0.30
+-- Phiên bản PHP: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -91,6 +91,31 @@ CREATE TABLE `donhang` (
   `trang_thai` tinyint(4) DEFAULT 1 COMMENT '1: Mới, 2: Đang giao, 3: Hoàn thành, 0: Hủy',
   `ngay_dat` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Cấu trúc bảng cho bảng `lienhe`
+--
+
+CREATE TABLE `lienhe` (
+  `id` int(11) NOT NULL,
+  `ho_ten` varchar(255) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `sdt` varchar(20) NOT NULL,
+  `noi_dung` text NOT NULL,
+  `trang_thai` tinyint(4) DEFAULT 0 COMMENT '0: Chưa xem, 1: Đã xem',
+  `ngay_gui` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Đang đổ dữ liệu cho bảng `lienhe`
+--
+
+INSERT INTO `lienhe` (`id`, `ho_ten`, `email`, `sdt`, `noi_dung`, `trang_thai`, `ngay_gui`) VALUES
+(4, 'bao', 'bao@gmail.com', '456454', 'xin chao ', 0, '2025-12-22 10:40:15'),
+(5, 'giang', 'giang95674@st.vimaru.edu.vn', '5641313', 'mua hang', 1, '2025-12-22 10:40:36'),
+(6, 'hoang', 'hoang@gmail.com', '546546', 'địa chỉ', 1, '2025-12-22 10:41:01');
 
 -- --------------------------------------------------------
 
@@ -206,6 +231,12 @@ ALTER TABLE `donhang`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Chỉ mục cho bảng `lienhe`
+--
+ALTER TABLE `lienhe`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Chỉ mục cho bảng `sanpham`
 --
 ALTER TABLE `sanpham`
@@ -252,6 +283,12 @@ ALTER TABLE `danhmuc`
 --
 ALTER TABLE `donhang`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT cho bảng `lienhe`
+--
+ALTER TABLE `lienhe`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT cho bảng `sanpham`

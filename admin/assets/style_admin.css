@@ -1,5 +1,5 @@
 /* =========================================
-   RESET & FONTS
+   1. RESET & CẤU HÌNH CHUNG
    ========================================= */
 @import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap");
 
@@ -11,11 +11,16 @@
 }
 
 body {
-  background-color: #f4f6f9;
+  background-color: #f4f6f9; /* Màu nền xám nhẹ cho toàn trang */
+  color: #333;
+  min-height: 100vh;
 }
 
+a { text-decoration: none; }
+ul { list-style: none; }
+
 /* =========================================
-   HEADER ADMIN
+   2. HEADER ADMIN (THANH TRÊN CÙNG)
    ========================================= */
 .admin-header {
   background: linear-gradient(90deg, #004e92 0%, #000428 100%);
@@ -26,44 +31,30 @@ body {
   align-items: center;
   justify-content: space-between;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-  position: sticky;
+  position: sticky; /* Ghim menu lên đầu */
   top: 0;
   z-index: 1000;
 }
 
-/* --- LOGO ADMIN --- */
+/* --- LOGO --- */
 .admin-logo {
   font-size: 24px;
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 1px;
   color: #fff;
-  text-decoration: none;
   display: flex;
   align-items: center;
   gap: 10px;
 }
-.admin-logo i {
-  color: #00d2ff;
-}
+.admin-logo i { color: #00d2ff; }
 
 /* --- MENU NGANG --- */
-.admin-menu {
-  display: flex;
-  height: 100%;
-}
-
-.menu-item {
-  position: relative;
-  list-style: none;
-  height: 100%;
-  display: flex;
-  align-items: center;
-}
+.admin-menu { display: flex; height: 100%; }
+.menu-item { position: relative; height: 100%; display: flex; align-items: center; }
 
 .menu-link {
   color: rgba(255, 255, 255, 0.9);
-  text-decoration: none;
   font-size: 14px;
   font-weight: 500;
   padding: 0 20px;
@@ -78,16 +69,10 @@ body {
   background-color: rgba(255, 255, 255, 0.1);
   color: #00d2ff;
 }
+.menu-link i { margin-right: 8px; }
+.arrow-down { font-size: 10px; margin-left: 5px; }
 
-.menu-link i {
-  margin-right: 8px;
-}
-.arrow-down {
-  font-size: 10px;
-  margin-left: 5px;
-}
-
-/* --- DROPDOWN MENU --- */
+/* --- DROPDOWN MENU (MENU CON) --- */
 .dropdown {
   position: absolute;
   top: 100%;
@@ -109,15 +94,10 @@ body {
   transform: translateY(0);
 }
 
-.dropdown li {
-  list-style: none;
-}
-
 .dropdown a {
   display: block;
   padding: 12px 20px;
   color: #333;
-  text-decoration: none;
   font-size: 13px;
   border-bottom: 1px solid #eee;
   transition: 0.2s;
@@ -130,84 +110,182 @@ body {
 }
 
 /* =========================================
-   PHẦN BÊN PHẢI (CHÀO ADMIN & NÚT LOGOUT)
+   3. PHẦN BÊN PHẢI (USER & NOTIFICATION)
    ========================================= */
-.admin-right {
-  display: flex;
-  align-items: center;
-  gap: 20px;
+.admin-right { display: flex; align-items: center; }
+
+/* --- THÔNG BÁO (NOTIFICATION) --- */
+.notif-wrapper {
+    position: relative;
+    margin-right: 25px;
+    z-index: 1001;
 }
 
-.admin-name {
-  font-size: 14px;
-  font-weight: 500;
+.notif-icon {
+    cursor: pointer;
+    position: relative;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 22px;
+    transition: all 0.3s ease;
+    padding: 5px;
+    display: flex;
+    align-items: center;
+}
+.notif-icon:hover { color: #fff; transform: scale(1.1); }
+
+/* Số đỏ trên chuông */
+.badge {
+    position: absolute;
+    top: -5px; right: -5px;
+    background: #ff3b30;
+    color: white;
+    border-radius: 50%;
+    padding: 2px 5px;
+    min-width: 18px;
+    text-align: center;
+    font-size: 10px;
+    font-weight: bold;
+    border: 2px solid #004e92;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+/* Hộp Dropdown Thông báo */
+.notif-dropdown {
+    display: none; /* Mặc định ẩn */
+    position: absolute;
+    top: 50px; right: -10px;
+    width: 320px;
+    background: #fff;
+    color: #333;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    overflow: hidden;
+    animation: slideDown 0.2s ease-out;
+}
+.notif-dropdown.active { display: block; }
+
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.notif-header {
+    background: #f8f9fa; padding: 12px 15px;
+    border-bottom: 1px solid #eee;
+    display: flex; justify-content: space-between; align-items: center;
+}
+.notif-header span { font-weight: bold; font-size: 14px; }
+.notif-header small { color: #e65100; font-weight: bold; }
+
+.notif-body { max-height: 350px; overflow-y: auto; }
+/* Scrollbar đẹp cho hộp thông báo */
+.notif-body::-webkit-scrollbar { width: 6px; }
+.notif-body::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
+
+.notif-item {
+    display: block; padding: 12px 15px;
+    border-bottom: 1px solid #f1f1f1;
+    transition: background 0.2s;
+}
+.notif-item:hover { background: #f0f7ff; }
+
+.notif-item-top { display: flex; justify-content: space-between; margin-bottom: 4px; }
+.notif-name { font-weight: bold; font-size: 13px; color: #004e92; }
+.notif-time { font-size: 11px; color: #999; }
+.notif-content { font-size: 12px; color: #555; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
+
+.notif-footer { text-align: center; background: #f8f9fa; padding: 10px; border-top: 1px solid #eee; }
+.notif-footer a { font-size: 13px; color: #004e92; font-weight: 600; }
+
+/* --- USER PILL (PROFILE ADMIN) --- */
+.user-pill {
+  display: flex; align-items: center; gap: 15px;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 5px 5px 5px 20px;
+  border-radius: 50px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+}
+.user-pill:hover { background: rgba(255, 255, 255, 0.2); }
+
+.user-text { display: flex; flex-direction: column; text-align: right; line-height: 1.2; }
+.user-text small { font-size: 11px; color: rgba(255, 255, 255, 0.7); }
+.user-text strong { font-size: 14px; color: #fff; font-weight: 600; }
+
+.btn-logout-circle {
+  width: 38px; height: 38px; border-radius: 50%;
+  background-color: #fff; color: #ef4444;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.3s ease; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); font-size: 16px;
+}
+.btn-logout-circle:hover {
+  background-color: #ef4444; color: white;
+  transform: rotate(90deg); box-shadow: 0 0 15px rgba(239, 68, 68, 0.6);
 }
 
 /* =========================================
-CỤM USER & NÚT LOGOUT (MỚI - STYLE IOT)
+   4. PHẦN NỘI DUNG TRANG (BẢNG, TIÊU ĐỀ...)
+   (Phần này bổ sung thêm để trang phanhoi.php đẹp hơn)
    ========================================= */
 
-/* Khung bao quanh (Pill) */
-.user-pill {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  background: rgba(
-    255,
-    255,
-    255,
-    0.1
-  ); /* Nền mờ trong suốt để hợp với header xanh */
-  padding: 5px 5px 5px 20px;
-  border-radius: 50px;
-  border: 1px solid rgba(255, 255, 255, 0.2); /* Viền mỏng nhẹ */
-  transition: all 0.3s ease;
+/* Container chính bao quanh nội dung */
+.main-content {
+    padding: 30px;
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
-.user-pill:hover {
-  background: rgba(255, 255, 255, 0.2); /* Sáng lên chút khi di chuột vào */
+/* Tiêu đề trang h1, h2 */
+h1, h2 { color: #004e92; margin-bottom: 20px; font-weight: 700; }
+
+/* --- BẢNG DỮ LIỆU (Table) --- */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    border-radius: 8px;
+    overflow: hidden; /* Bo tròn góc bảng */
+    margin-top: 10px;
 }
 
-/* Phần chữ "Xin chào..." */
-.user-text {
-  display: flex;
-  flex-direction: column;
-  text-align: right;
-  line-height: 1.2;
+table th, table td {
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+    text-align: left;
 }
 
-.user-text small {
-  font-size: 11px;
-  color: rgba(255, 255, 255, 0.7); /* Màu trắng mờ */
-  font-weight: 400;
+table th {
+    background: #004e92; /* Header bảng màu xanh */
+    color: #fff;
+    text-transform: uppercase;
+    font-size: 13px;
+    letter-spacing: 0.5px;
 }
 
-.user-text strong {
-  font-size: 14px;
-  color: #fff; /* Màu trắng sáng */
-  font-weight: 600;
+table tr:hover {
+    background-color: #f9f9f9; /* Hiệu ứng khi di chuột vào dòng */
 }
 
-/* Nút tròn Logout (Quan trọng nhất) */
-.btn-logout-circle {
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-  background-color: #fff;
-  color: #ef4444; /* Màu đỏ của icon */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-decoration: none;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-  font-size: 16px;
+/* Trạng thái tin chưa đọc (dùng trong phanhoi.php) */
+tr.unread {
+    background-color: #fff8e1; /* Màu cam nhạt */
+    font-weight: 500;
 }
+tr.unread td { color: #e65100; }
 
-/* Hiệu ứng khi di chuột vào nút tròn */
-.btn-logout-circle:hover {
-  background-color: #ef4444; /* Đổi nền sang đỏ */
-  color: white; /* Icon thành trắng */
-  transform: rotate(90deg); /* Xoay 90 độ (Signature move!) */
-  box-shadow: 0 0 15px rgba(239, 68, 68, 0.6); /* Phát sáng nhẹ */
+/* Nút xóa (Icon thùng rác) */
+.btn-del {
+    color: #ef4444;
+    font-weight: bold;
+    font-size: 13px;
+    padding: 5px 10px;
+    border-radius: 4px;
+    transition: 0.2s;
+    background: rgba(239, 68, 68, 0.1);
+}
+.btn-del:hover {
+    background: #ef4444;
+    color: white;
 }
