@@ -1,0 +1,209 @@
+/* =========================================
+   STYLE CHUNG & RESET
+   ========================================= */
+body {
+  font-family: "Segoe UI", "Roboto", Helvetica, Arial, sans-serif;
+  background-color: #f2f7ff; /* Nền sáng xanh nhẹ */
+  color: #344767;
+}
+.wrap-content {
+  padding: 30px;
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+/* =========================================
+   HEADER
+   ========================================= */
+.form-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 25px;
+}
+.page-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #2c3e50;
+  margin: 0;
+}
+.btn-back {
+  color: #607080;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  background: #fff;
+  border: 1px solid #ddd;
+  transition: all 0.2s ease;
+}
+.btn-back:hover {
+  color: #435ebe;
+  border-color: #435ebe;
+  background: #f0f4ff;
+}
+
+/* =========================================
+   FORM CONTAINER
+   ========================================= */
+.form-container {
+  background: #ffffff;
+  padding: 40px;
+  border-radius: 10px;
+  /* Yêu cầu: Viền to hơn chút */
+  border: 2px solid #dce1e6;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+  max-width: 950px;
+  margin: 0 auto;
+}
+
+/* Layout Flexbox */
+.form-row {
+  display: flex;
+  gap: 25px;
+  margin-bottom: 20px;
+}
+.form-col {
+  flex: 1;
+}
+.form-group {
+  margin-bottom: 20px;
+}
+
+/* Nhãn (Label) */
+.form-label {
+  display: block;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: #344767;
+  font-size: 14px;
+}
+
+/* Ô nhập liệu */
+.form-control {
+  width: 100%;
+  padding: 10px 15px;
+  background-color: #fff;
+  border: 1px solid #dce1e6;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #495057;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+.form-control:focus {
+  border-color: #435ebe;
+  box-shadow: 0 0 0 3px rgba(67, 94, 190, 0.15);
+  outline: none;
+}
+
+/* Yêu cầu: Mô tả chi tiết to và dài ra */
+textarea.form-control {
+  resize: vertical;
+  min-height: 300px; /* Chiều cao tối thiểu lớn hơn hẳn */
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+/* =========================================
+   KHUNG ẢNH PREVIEW
+   ========================================= */
+.image-preview-container {
+  margin-top: 5px;
+  border: 2px dashed #dce1e6;
+  padding: 10px;
+  border-radius: 8px;
+  text-align: center;
+  background-color: #f8f9fa;
+  height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.image-preview {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  display: none;
+}
+.no-image-text {
+  color: #aaa;
+  font-size: 13px;
+  font-style: italic;
+}
+
+/* =========================================
+   NÚT SUBMIT (Style giống nút Sửa/Primary)
+   ========================================= */
+/* =========================================
+   3. NÚT LƯU (FIX CỨNG CHO GIỐNG HỆT NÚT SỬA)
+   ========================================= */
+.btn-submit {
+  /* Màu sắc giống hệt .btn-edit */
+  background-color: #eef2f7 !important;
+  color: #4a69bd !important;
+
+  /* Reset style mặc định của thẻ button */
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+
+  /* Kích thước và font */
+  padding: 10px 30px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+
+  /* Canh chỉnh icon và chữ */
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease-in-out;
+}
+
+/* Hiệu ứng khi di chuột vào (Hover) */
+.btn-submit:hover {
+  background-color: #dbeafe !important;
+  color: #1e3a8a !important;
+}
+
+/* Hiệu ứng khi bấm xuống (Active) */
+.btn-submit:active {
+  transform: translateY(1px); /* Nhún nhẹ khi bấm */
+}
+
+/* =========================================
+   TOAST NOTIFICATION
+   ========================================= */
+#toast {
+  visibility: hidden;
+  min-width: 300px;
+  background-color: #fff;
+  color: #333;
+  border-radius: 6px;
+  padding: 16px 20px;
+  position: fixed;
+  z-index: 10000;
+  right: 30px;
+  top: 30px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+  border-left: 5px solid #198754;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  transform: translateX(120%);
+  transition: transform 0.4s ease, visibility 0.4s;
+}
+#toast.show {
+  visibility: visible;
+  transform: translateX(0);
+}
+.toast-icon {
+  color: #198754;
+}
