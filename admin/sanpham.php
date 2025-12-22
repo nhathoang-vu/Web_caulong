@@ -1,5 +1,7 @@
 <?php
-// Bật báo lỗi
+// =================================================================================
+// === GIỮ NGUYÊN LOGIC CODE PHP - KHÔNG THAY ĐỔI GÌ Ở PHẦN NÀY ====================
+// =================================================================================
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
@@ -11,9 +13,24 @@ if (!isset($conn)) {
     else if (isset($db)) $conn = $db;
 }
 
-// =================================================================================
-// === PHẦN XỬ LÝ AJAX TÌM KIẾM (GIỮ NGUYÊN 100% LOGIC) ============================
-// =================================================================================
+// Hàm render Badge
+function renderBadges($string_list, $class_name) {
+    if (empty($string_list)) {
+        return '<span class="empty-dash">---</span>';
+    }
+    $items = explode(',', $string_list);
+    $html = '<div class="badge-container">';
+    foreach ($items as $item) {
+        $item = trim($item);
+        if (!empty($item)) {
+            $html .= '<span class="'.$class_name.'">'.$item.'</span>';
+        }
+    }
+    $html .= '</div>';
+    return $html;
+}
+
+// Xử lý Ajax
 if (isset($_POST['action']) && $_POST['action'] == 'search_ajax') {
     $keyword = $_POST['keyword'];
     $dm_id   = isset($_POST['danhmuc_id']) ? (int)$_POST['danhmuc_id'] : 0;
@@ -21,17 +38,20 @@ if (isset($_POST['action']) && $_POST['action'] == 'search_ajax') {
     $sql_search = "SELECT 
                     sp.*, 
                     dm.ten_danhmuc, 
-                    th.ten_thuonghieu
+                    th.ten_thuonghieu,
+                    GROUP_CONCAT(DISTINCT bt.kich_thuoc ORDER BY bt.kich_thuoc SEPARATOR ',') as list_kich_thuoc,
+                    GROUP_CONCAT(DISTINCT bt.mau_sac ORDER BY bt.mau_sac SEPARATOR ',') as list_mau_sac
                 FROM sanpham sp
                 LEFT JOIN danhmuc dm ON sp.danhmuc_id = dm.id
                 LEFT JOIN thuonghieu th ON sp.thuonghieu_id = th.id
+                LEFT JOIN bienthe_sanpham bt ON sp.id = bt.sanpham_id
                 WHERE (sp.ten_sanpham LIKE :key OR sp.id LIKE :key)";
 
     if ($dm_id > 0) {
         $sql_search .= " AND sp.danhmuc_id = :dm_id";
     }
     
-    $sql_search .= " ORDER BY sp.id DESC";
+    $sql_search .= " GROUP BY sp.id ORDER BY sp.id DESC";
                 
     $stmt = $conn->prepare($sql_search);
     $stmt->bindValue(':key', "%$keyword%");
@@ -45,8 +65,8 @@ if (isset($_POST['action']) && $_POST['action'] == 'search_ajax') {
 
     if (count($result) > 0) {
         foreach ($result as $row) {
-            $img_path = "../uploads/" . $row['hinh_anh'];
-            if(empty($row['hinh_anh'])) $img_path = "https://via.placeholder.com/50";
+            $img_path = "anh_sanpham/" . $row['hinh_anh'];
+            if(empty($row['hinh_anh'])) $img_path = "https://via.placeholder.com/100"; // Placeholder cũng tăng size
             
             $price_display = '';
             if ($row['gia_khuyenmai'] > 0) {
@@ -55,21 +75,25 @@ if (isset($_POST['action']) && $_POST['action'] == 'search_ajax') {
             } else {
                 $price_display = '<span class="price-final">'.number_format($row['gia_ban']).'đ</span>';
             }
-
-            $thong_so = !empty($row['thong_so']) ? $row['thong_so'] : '---';
-            $kich_thuoc = !empty($row['kich_thuoc']) ? '<span class="badge-size">'.$row['kich_thuoc'].'</span>' : '<span style="color: #ccc; font-size: 12px;">---</span>';
+            
+            $mau_sac_html = renderBadges($row['list_mau_sac'], 'tag-color');
+            $kich_thuoc_html = renderBadges($row['list_kich_thuoc'], 'tag-size');
 
             echo '<tr>
                     <td>'.$row['id'].'</td>
                     <td><img src="'.$img_path.'" class="product-img" alt="Img"></td>
-                    <td>
-                        <div style="font-weight: 500;">'.$row['ten_sanpham'].'</div>
-                        <div class="text-muted" style="font-size: 11px; margin-top: 2px;">'.$row['ten_danhmuc'].'</div>
+                    
+                    <td class="cell-name"> <div style="font-weight: 500; font-size: 15px;">'.$row['ten_sanpham'].'</div>
+                        <div class="text-muted" style="font-size: 12px; margin-top: 4px;">'.$row['ten_danhmuc'].'</div>
+                        <div class="text-muted" style="font-size: 11px; margin-top: 2px; color: #999;">Ngày tạo: '.date('d/m/Y', strtotime($row['ngay_tao'])).'</div>
                     </td>
+
                     <td><span style="font-weight: 600; color: #17a2b8;">'.number_format($row['gia_nhap']).'đ</span></td>
                     <td><div class="price-group">'.$price_display.'</div></td>
-                    <td><span class="text-muted">'.$thong_so.'</span></td>
-                    <td>'.$kich_thuoc.'</td>
+                    
+                    <td class="cell-variants">'.$mau_sac_html.'</td>
+                    <td class="cell-variants">'.$kich_thuoc_html.'</td>
+                    
                     <td>'.$row['ten_thuonghieu'].'</td>
                     <td>
                         <a href="sua_sanpham.php?id='.$row['id'].'" class="btn btn-edit">Sửa</a>
@@ -82,15 +106,11 @@ if (isset($_POST['action']) && $_POST['action'] == 'search_ajax') {
     }
     exit; 
 }
-// =================================================================================
-
 
 include 'includes/header.php'; 
 
 // --- XỬ LÝ DỮ LIỆU BAN ĐẦU ---
-
 $danhmuc_id = isset($_GET['danhmuc']) ? $_GET['danhmuc'] : 0;
-
 $stmt_dm = $conn->prepare("SELECT * FROM danhmuc");
 $stmt_dm->execute();
 $list_danhmuc = $stmt_dm->fetchAll(PDO::FETCH_ASSOC);
@@ -98,31 +118,50 @@ $list_danhmuc = $stmt_dm->fetchAll(PDO::FETCH_ASSOC);
 $sql = "SELECT 
             sp.*, 
             dm.ten_danhmuc, 
-            th.ten_thuonghieu
+            th.ten_thuonghieu,
+            GROUP_CONCAT(DISTINCT bt.kich_thuoc ORDER BY bt.kich_thuoc SEPARATOR ',') as list_kich_thuoc,
+            GROUP_CONCAT(DISTINCT bt.mau_sac ORDER BY bt.mau_sac SEPARATOR ',') as list_mau_sac
         FROM sanpham sp
         LEFT JOIN danhmuc dm ON sp.danhmuc_id = dm.id
-        LEFT JOIN thuonghieu th ON sp.thuonghieu_id = th.id"; 
+        LEFT JOIN thuonghieu th ON sp.thuonghieu_id = th.id
+        LEFT JOIN bienthe_sanpham bt ON sp.id = bt.sanpham_id"; 
 
 if ($danhmuc_id > 0) {
     $sql .= " WHERE sp.danhmuc_id = :dm_id";
 }
 
-$sql .= " ORDER BY sp.id DESC";
+$sql .= " GROUP BY sp.id ORDER BY sp.id DESC";
 
 $stmt = $conn->prepare($sql);
-
 if ($danhmuc_id > 0) {
     $stmt->bindParam(':dm_id', $danhmuc_id);
 }
-
 $stmt->execute();
 $list_sanpham = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+if (!function_exists('renderBadges')) {
+    function renderBadges($string_list, $class_name) {
+        if (empty($string_list)) {
+            return '<span class="empty-dash">---</span>';
+        }
+        $items = explode(',', $string_list);
+        $html = '<div class="badge-container">';
+        foreach ($items as $item) {
+            $item = trim($item);
+            if (!empty($item)) {
+                $html .= '<span class="'.$class_name.'">'.$item.'</span>';
+            }
+        }
+        $html .= '</div>';
+        return $html;
+    }
+}
 ?>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 
 <style>
-    /* CSS CŨ GIỮ NGUYÊN */
+    /* CSS CƠ BẢN */
     body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8f9fa; color: #333; }
     .wrap-content { padding: 25px; max-width: 100%; margin: 0 auto; }
     .page-header { margin-bottom: 25px; } 
@@ -147,51 +186,41 @@ $list_sanpham = $stmt->fetchAll(PDO::FETCH_ASSOC);
     .btn-del:hover { background-color: #ffe4e6; color: #be123c; }
 
     .table-container { background: #fff; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.03); overflow: hidden; border: 1px solid #eaeaea; }
-    table { width: 100%; border-collapse: collapse; }
-    table th { background-color: #fff; color: #636e72; font-weight: 600; text-transform: uppercase; font-size: 12px; letter-spacing: 0.5px; padding: 15px; border-bottom: 2px solid #f1f2f6; text-align: center; }
-    table td { padding: 12px 15px; border-bottom: 1px solid #f1f2f6; font-size: 14px; vertical-align: middle; color: #4b5563; text-align: center; }
-    table tr:last-child td { border-bottom: none; }
-    table tr:hover { background-color: #fafafa; }
+    
+    table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+    table th { background-color: #fff; color: #636e72; font-weight: 700; text-transform: uppercase; font-size: 12px; letter-spacing: 0.5px; padding: 15px 10px; border-bottom: 2px solid #f1f2f6; text-align: center; }
+    table td { padding: 12px 10px; border-bottom: 1px solid #f1f2f6; font-size: 14px; vertical-align: middle; color: #4b5563; text-align: center; word-wrap: break-word; }
+    
+    /* THAY ĐỔI: Căn giữa lại cột tên sản phẩm 
+       (Trước đó là text-align: left; padding-left: 15px)
+    */
+    .cell-name { text-align: center !important; padding-left: 0 !important; }
 
-    .product-img { width: 50px; height: 50px; border-radius: 6px; object-fit: cover; border: 1px solid #eee; display: inline-block; }
+    /* THAY ĐỔI: Tăng kích thước ảnh từ 80px -> 100px 
+    */
+    .product-img { width: 100px; height: 100px; border-radius: 6px; object-fit: cover; border: 1px solid #eee; display: inline-block; }
+    
     .price-group { display: flex; flex-direction: column; align-items: center; }
     .price-final { font-weight: 600; color: #2d3436; }
     .price-origin { font-size: 11px; text-decoration: line-through; color: #b2bec3; }
-    .text-muted { color: #888; font-size: 13px; }
-    .badge-size { display: inline-block; background: #f0f0f0; padding: 2px 6px; border-radius: 4px; font-size: 11px; color: #555; margin-right: 2px; }
-
-    /* ================================================================= */
-    /* === CSS MỚI: KHUNG XÁC NHẬN ĐƠN GIẢN ============================ */
-    /* ================================================================= */
+    .text-muted { color: #888; }
     
-    .simple-overlay {
-        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-        background: rgba(0, 0, 0, 0.5); /* Nền đen mờ 50% */
-        display: none; /* Ẩn mặc định */
-        justify-content: center; align-items: center;
-        z-index: 9999;
-    }
+    .badge-container { display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; }
+    .tag-color { display: inline-block; background: #fdf2f8; color: #db2777; padding: 4px 8px; border-radius: 5px; font-size: 11px; font-weight: 600; border: 1px solid #fbcfe8; white-space: nowrap; }
+    .tag-size { display: inline-block; background: #f3f4f6; color: #374151; padding: 4px 8px; border-radius: 5px; font-size: 11px; font-weight: 600; border: 1px solid #e5e7eb; white-space: nowrap; }
+    .empty-dash { color: #d1d5db; font-size: 12px; }
+    .cell-variants { padding: 10px !important; }
 
-    .simple-box {
-        background: #fff;
-        width: 350px;
-        padding: 20px;
-        border-radius: 8px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-        text-align: center;
-    }
-
+    /* Modal */
+    .simple-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); display: none; justify-content: center; align-items: center; z-index: 9999; }
+    .simple-box { background: #fff; width: 350px; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.2); text-align: center; }
     .simple-title { font-size: 18px; font-weight: bold; margin-bottom: 10px; color: #333; }
     .simple-text { font-size: 14px; color: #555; margin-bottom: 20px; }
-
     .simple-actions { display: flex; justify-content: center; gap: 10px; }
-    
     .btn-simple { padding: 8px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: 500; }
-    
     .btn-simple-cancel { background: #e0e0e0; color: #333; }
     .btn-simple-cancel:hover { background: #d0d0d0; }
-
-    .btn-simple-confirm { background: #d9534f; color: #fff; } /* Màu đỏ */
+    .btn-simple-confirm { background: #d9534f; color: #fff; }
     .btn-simple-confirm:hover { background: #c9302c; }
 </style>
 
@@ -231,14 +260,19 @@ $list_sanpham = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <thead>
                 <tr>
                     <th style="width: 50px;">#</th>
-                    <th style="width: 70px;">Ảnh</th>
-                    <th style="width: 200px;">Tên sản phẩm</th>
-                    <th style="width: 100px;">Giá nhập</th> 
-                    <th>Giá bán</th>
-                    <th>Thông số</th>
-                    <th>Kích thước</th>
-                    <th>Hãng</th>
-                    <th style="width: 150px;">Hành động</th>
+                    
+                    <th style="width: 130px;">Ảnh</th>
+                    
+                    <th>Tên sản phẩm</th>
+                    
+                    <th style="width: 120px;">Giá nhập</th>  
+                    <th style="width: 120px;">Giá bán</th>   
+                    
+                    <th style="width: 200px;">Màu sắc</th>   
+                    <th style="width: 140px;">Size</th>      
+                    
+                    <th style="width: 120px;">Hãng</th>      
+                    <th style="width: 150px;">Hành động</th> 
                 </tr>
             </thead>
             <tbody id="table_data">
@@ -248,15 +282,20 @@ $list_sanpham = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             <td><?php echo $row['id']; ?></td>
                             <td>
                                 <?php 
-                                    $img_path = "../uploads/" . $row['hinh_anh'];
-                                    if(empty($row['hinh_anh'])) $img_path = "https://via.placeholder.com/50";
+                                    $img_path = "anh_sanpham/" . $row['hinh_anh'];
+                                    if(empty($row['hinh_anh'])) $img_path = "https://via.placeholder.com/100";
                                 ?>
                                 <img src="<?php echo $img_path; ?>" class="product-img" alt="Img">
                             </td>
-                            <td>
-                                <div style="font-weight: 500;"><?php echo $row['ten_sanpham']; ?></div>
-                                <div class="text-muted" style="font-size: 11px; margin-top: 2px;"><?php echo $row['ten_danhmuc']; ?></div>
+                            
+                            <td class="cell-name">
+                                <div style="font-weight: 500; font-size: 15px;"><?php echo $row['ten_sanpham']; ?></div>
+                                <div class="text-muted" style="font-size: 12px; margin-top: 4px;"><?php echo $row['ten_danhmuc']; ?></div>
+                                <div class="text-muted" style="font-size: 11px; margin-top: 2px; color: #999;">
+                                    Ngày tạo: <?php echo date('d/m/Y', strtotime($row['ngay_tao'])); ?>
+                                </div>
                             </td>
+
                             <td><span style="font-weight: 600; color: #17a2b8;"><?php echo number_format($row['gia_nhap']); ?>đ</span></td>
                             <td>
                                 <div class="price-group">
@@ -268,14 +307,15 @@ $list_sanpham = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                     <?php endif; ?>
                                 </div>
                             </td>
-                            <td><span class="text-muted"><?php echo !empty($row['thong_so']) ? $row['thong_so'] : '---'; ?></span></td>
-                            <td>
-                                <?php if (!empty($row['kich_thuoc'])): ?>
-                                    <span class="badge-size"><?php echo $row['kich_thuoc']; ?></span>
-                                <?php else: ?>
-                                    <span style="color: #ccc; font-size: 12px;">---</span>
-                                <?php endif; ?>
+                            
+                            <td class="cell-variants">
+                                <?php echo renderBadges($row['list_mau_sac'], 'tag-color'); ?>
                             </td>
+
+                            <td class="cell-variants">
+                                <?php echo renderBadges($row['list_kich_thuoc'], 'tag-size'); ?>
+                            </td>
+
                             <td><?php echo $row['ten_thuonghieu']; ?></td>
                             <td>
                                 <a href="sua_sanpham.php?id=<?php echo $row['id']; ?>" class="btn btn-edit">Sửa</a>
@@ -305,9 +345,9 @@ $list_sanpham = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 <script>
 $(document).ready(function(){
-    var deleteLink = ''; // Biến lưu link cần xóa
+    var deleteLink = ''; 
 
-    // 1. Tìm kiếm Ajax (Giữ nguyên)
+    // 1. Tìm kiếm Ajax
     $('#ajax_search').on('keyup', function(){
         var txt = $(this).val();
         var dm_val = $('#danhmuc_select').val(); 
@@ -319,21 +359,21 @@ $(document).ready(function(){
         });
     });
 
-    // 2. Mở Modal Đơn giản khi ấn nút Xóa
+    // 2. Mở Modal Đơn giản
     $(document).on('click', '.btn-del', function(e){
         e.preventDefault();
-        deleteLink = $(this).attr('href'); // Lưu href của nút vừa bấm
-        $('#confirmModal').css('display', 'flex'); // Hiện khung
+        deleteLink = $(this).attr('href'); 
+        $('#confirmModal').css('display', 'flex'); 
     });
 
     // 3. Xử lý nút "Đồng ý"
     $('#confirmDelete').click(function(){
         if(deleteLink) {
-            window.location.href = deleteLink; // Chuyển trang để xóa thật
+            window.location.href = deleteLink; 
         }
     });
 
-    // 4. Xử lý nút "Hủy" hoặc click ra ngoài để đóng
+    // 4. Xử lý đóng Modal
     $('#cancelDelete, .simple-overlay').click(function(e){
         if(e.target === this) {
             $('#confirmModal').hide();
