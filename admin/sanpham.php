@@ -1,7 +1,9 @@
 <?php
 // =================================================================================
-// === GIỮ NGUYÊN LOGIC CODE PHP - KHÔNG THAY ĐỔI GÌ Ở PHẦN NÀY ====================
+// === QUẢN LÝ SẢN PHẨM (ĐÃ FIX HEADER & THÔNG BÁO) ================================
 // =================================================================================
+session_start(); // <--- 1. BẮT BUỘC CÓ ĐỂ NHẬN THÔNG BÁO TỪ SESSION
+
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
@@ -66,12 +68,12 @@ if (isset($_POST['action']) && $_POST['action'] == 'search_ajax') {
     if (count($result) > 0) {
         foreach ($result as $row) {
             $img_path = "anh_sanpham/" . $row['hinh_anh'];
-            if(empty($row['hinh_anh'])) $img_path = "https://via.placeholder.com/100"; // Placeholder cũng tăng size
+            if(empty($row['hinh_anh'])) $img_path = "https://via.placeholder.com/100"; 
             
             $price_display = '';
             if ($row['gia_khuyenmai'] > 0) {
                 $price_display = '<span class="price-final">'.number_format($row['gia_khuyenmai']).'đ</span>
-                                  <span class="price-origin">'.number_format($row['gia_ban']).'đ</span>';
+                                    <span class="price-origin">'.number_format($row['gia_ban']).'đ</span>';
             } else {
                 $price_display = '<span class="price-final">'.number_format($row['gia_ban']).'đ</span>';
             }
@@ -99,15 +101,90 @@ if (isset($_POST['action']) && $_POST['action'] == 'search_ajax') {
                         <a href="sua_sanpham.php?id='.$row['id'].'" class="btn btn-edit">Sửa</a>
                         <a href="xoa_sanpham.php?id='.$row['id'].'" class="btn btn-del">Xóa</a>
                     </td>
-                  </tr>';
+                </tr>';
         }
     } else {
         echo '<tr><td colspan="9" style="text-align: center; padding: 30px; color: #999;">Không tìm thấy kết quả phù hợp.</td></tr>';
     }
     exit; 
 }
+?>
 
-include 'includes/header.php'; 
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Quản lý Sản phẩm</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <style>
+        /* CSS CƠ BẢN */
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8f9fa; color: #333; margin: 0; }
+        .wrap-content { padding: 25px; max-width: 100%; margin: 0 auto; }
+        .page-header { margin-bottom: 25px; } 
+        .page-title { font-size: 24px; font-weight: 600; color: #2c3e50; margin: 0; }
+        
+        .toolbar { background: #fff; padding: 15px 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.03); border: 1px solid #eaeaea; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; gap: 20px; }
+        .filter-group { display: flex; align-items: center; gap: 15px; flex-shrink: 0; }
+        .filter-select { padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; color: #555; outline: none; min-width: 200px; }
+        
+        .search-group { flex-grow: 1; display: flex; justify-content: center; }
+        .search-box { position: relative; width: 100%; max-width: 400px; }
+        .search-input { width: 100%; padding: 9px 15px 9px 35px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; outline: none; transition: border 0.2s; box-sizing: border-box; }
+        .search-input:focus { border-color: #4a69bd; box-shadow: 0 0 0 3px rgba(74, 105, 189, 0.1); }
+        .search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #999; pointer-events: none; }
+
+        .btn { padding: 8px 16px; border-radius: 6px; font-size: 14px; font-weight: 500; text-decoration: none; display: inline-block; cursor: pointer; transition: all 0.2s; border: none; }
+        .btn-create { background-color: #eef2f7; color: #4a69bd; font-weight: 600; display: inline-flex; align-items: center; gap: 5px; flex-shrink: 0; }
+        .btn-create:hover { background-color: #dbeafe; color: #1e3a8a; }
+        .btn-edit { background-color: #eef2f7; color: #4a69bd; font-weight: 600; }
+        .btn-edit:hover { background-color: #dbeafe; color: #1e3a8a; }
+        .btn-del { background-color: #fff1f2; color: #e11d48; font-weight: 600; margin-left: 5px; }
+        .btn-del:hover { background-color: #ffe4e6; color: #be123c; }
+
+        .table-container { background: #fff; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.03); overflow: hidden; border: 1px solid #eaeaea; }
+        
+        table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+        table th { background-color: #fff; color: #636e72; font-weight: 700; text-transform: uppercase; font-size: 12px; letter-spacing: 0.5px; padding: 15px 10px; border-bottom: 2px solid #f1f2f6; text-align: center; }
+        table td { padding: 12px 10px; border-bottom: 1px solid #f1f2f6; font-size: 14px; vertical-align: middle; color: #4b5563; text-align: center; word-wrap: break-word; }
+        
+        .cell-name { text-align: center !important; padding-left: 0 !important; }
+        .product-img { width: 100px; height: 100px; border-radius: 6px; object-fit: cover; border: 1px solid #eee; display: inline-block; }
+        
+        .price-group { display: flex; flex-direction: column; align-items: center; }
+        .price-final { font-weight: 600; color: #2d3436; }
+        .price-origin { font-size: 11px; text-decoration: line-through; color: #b2bec3; }
+        .text-muted { color: #888; }
+        
+        .badge-container { display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; }
+        .tag-color { display: inline-block; background: #fdf2f8; color: #db2777; padding: 4px 8px; border-radius: 5px; font-size: 11px; font-weight: 600; border: 1px solid #fbcfe8; white-space: nowrap; }
+        .tag-size { display: inline-block; background: #f3f4f6; color: #374151; padding: 4px 8px; border-radius: 5px; font-size: 11px; font-weight: 600; border: 1px solid #e5e7eb; white-space: nowrap; }
+        .empty-dash { color: #d1d5db; font-size: 12px; }
+        .cell-variants { padding: 10px !important; }
+
+        /* Modal */
+        .simple-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); display: none; justify-content: center; align-items: center; z-index: 9999; }
+        .simple-box { background: #fff; width: 350px; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.2); text-align: center; }
+        .simple-title { font-size: 18px; font-weight: bold; margin-bottom: 10px; color: #333; }
+        .simple-text { font-size: 14px; color: #555; margin-bottom: 20px; }
+        .simple-actions { display: flex; justify-content: center; gap: 10px; }
+        .btn-simple { padding: 8px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: 500; }
+        .btn-simple-cancel { background: #e0e0e0; color: #333; }
+        .btn-simple-cancel:hover { background: #d0d0d0; }
+        .btn-simple-confirm { background: #d9534f; color: #fff; }
+        .btn-simple-confirm:hover { background: #c9302c; }
+    </style>
+</head>
+<body>
+
+<?php 
+// 2. INCLUDE HEADER (ĐÃ SỬA LẠI ĐƯỜNG DẪN CHO GIỐNG NCC.PHP)
+if (file_exists('includes/header.php')) {
+    include 'includes/header.php';
+} elseif (file_exists('header.php')) {
+    include 'header.php';
+} else {
+    echo "<div style='background:red; color:white; padding:5px; text-align:center'>Không tìm thấy file header.php</div>";
+}
 
 // --- XỬ LÝ DỮ LIỆU BAN ĐẦU ---
 $danhmuc_id = isset($_GET['danhmuc']) ? $_GET['danhmuc'] : 0;
@@ -138,91 +215,7 @@ if ($danhmuc_id > 0) {
 }
 $stmt->execute();
 $list_sanpham = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-if (!function_exists('renderBadges')) {
-    function renderBadges($string_list, $class_name) {
-        if (empty($string_list)) {
-            return '<span class="empty-dash">---</span>';
-        }
-        $items = explode(',', $string_list);
-        $html = '<div class="badge-container">';
-        foreach ($items as $item) {
-            $item = trim($item);
-            if (!empty($item)) {
-                $html .= '<span class="'.$class_name.'">'.$item.'</span>';
-            }
-        }
-        $html .= '</div>';
-        return $html;
-    }
-}
 ?>
-
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-
-<style>
-    /* CSS CƠ BẢN */
-    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8f9fa; color: #333; }
-    .wrap-content { padding: 25px; max-width: 100%; margin: 0 auto; }
-    .page-header { margin-bottom: 25px; } 
-    .page-title { font-size: 24px; font-weight: 600; color: #2c3e50; margin: 0; }
-    
-    .toolbar { background: #fff; padding: 15px 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.03); border: 1px solid #eaeaea; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; gap: 20px; }
-    .filter-group { display: flex; align-items: center; gap: 15px; flex-shrink: 0; }
-    .filter-select { padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; color: #555; outline: none; min-width: 200px; }
-    
-    .search-group { flex-grow: 1; display: flex; justify-content: center; }
-    .search-box { position: relative; width: 100%; max-width: 400px; }
-    .search-input { width: 100%; padding: 9px 15px 9px 35px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; outline: none; transition: border 0.2s; box-sizing: border-box; }
-    .search-input:focus { border-color: #4a69bd; box-shadow: 0 0 0 3px rgba(74, 105, 189, 0.1); }
-    .search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #999; pointer-events: none; }
-
-    .btn { padding: 8px 16px; border-radius: 6px; font-size: 14px; font-weight: 500; text-decoration: none; display: inline-block; cursor: pointer; transition: all 0.2s; border: none; }
-    .btn-create { background-color: #eef2f7; color: #4a69bd; font-weight: 600; display: inline-flex; align-items: center; gap: 5px; flex-shrink: 0; }
-    .btn-create:hover { background-color: #dbeafe; color: #1e3a8a; }
-    .btn-edit { background-color: #eef2f7; color: #4a69bd; font-weight: 600; }
-    .btn-edit:hover { background-color: #dbeafe; color: #1e3a8a; }
-    .btn-del { background-color: #fff1f2; color: #e11d48; font-weight: 600; margin-left: 5px; }
-    .btn-del:hover { background-color: #ffe4e6; color: #be123c; }
-
-    .table-container { background: #fff; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.03); overflow: hidden; border: 1px solid #eaeaea; }
-    
-    table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-    table th { background-color: #fff; color: #636e72; font-weight: 700; text-transform: uppercase; font-size: 12px; letter-spacing: 0.5px; padding: 15px 10px; border-bottom: 2px solid #f1f2f6; text-align: center; }
-    table td { padding: 12px 10px; border-bottom: 1px solid #f1f2f6; font-size: 14px; vertical-align: middle; color: #4b5563; text-align: center; word-wrap: break-word; }
-    
-    /* THAY ĐỔI: Căn giữa lại cột tên sản phẩm 
-       (Trước đó là text-align: left; padding-left: 15px)
-    */
-    .cell-name { text-align: center !important; padding-left: 0 !important; }
-
-    /* THAY ĐỔI: Tăng kích thước ảnh từ 80px -> 100px 
-    */
-    .product-img { width: 100px; height: 100px; border-radius: 6px; object-fit: cover; border: 1px solid #eee; display: inline-block; }
-    
-    .price-group { display: flex; flex-direction: column; align-items: center; }
-    .price-final { font-weight: 600; color: #2d3436; }
-    .price-origin { font-size: 11px; text-decoration: line-through; color: #b2bec3; }
-    .text-muted { color: #888; }
-    
-    .badge-container { display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; }
-    .tag-color { display: inline-block; background: #fdf2f8; color: #db2777; padding: 4px 8px; border-radius: 5px; font-size: 11px; font-weight: 600; border: 1px solid #fbcfe8; white-space: nowrap; }
-    .tag-size { display: inline-block; background: #f3f4f6; color: #374151; padding: 4px 8px; border-radius: 5px; font-size: 11px; font-weight: 600; border: 1px solid #e5e7eb; white-space: nowrap; }
-    .empty-dash { color: #d1d5db; font-size: 12px; }
-    .cell-variants { padding: 10px !important; }
-
-    /* Modal */
-    .simple-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); display: none; justify-content: center; align-items: center; z-index: 9999; }
-    .simple-box { background: #fff; width: 350px; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.2); text-align: center; }
-    .simple-title { font-size: 18px; font-weight: bold; margin-bottom: 10px; color: #333; }
-    .simple-text { font-size: 14px; color: #555; margin-bottom: 20px; }
-    .simple-actions { display: flex; justify-content: center; gap: 10px; }
-    .btn-simple { padding: 8px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: 500; }
-    .btn-simple-cancel { background: #e0e0e0; color: #333; }
-    .btn-simple-cancel:hover { background: #d0d0d0; }
-    .btn-simple-confirm { background: #d9534f; color: #fff; }
-    .btn-simple-confirm:hover { background: #c9302c; }
-</style>
 
 <div class="wrap-content">
     
@@ -260,19 +253,14 @@ if (!function_exists('renderBadges')) {
             <thead>
                 <tr>
                     <th style="width: 50px;">#</th>
-                    
                     <th style="width: 130px;">Ảnh</th>
-                    
                     <th>Tên sản phẩm</th>
-                    
                     <th style="width: 120px;">Giá nhập</th>  
                     <th style="width: 120px;">Giá bán</th>   
-                    
                     <th style="width: 200px;">Màu sắc</th>   
                     <th style="width: 140px;">Size</th>      
-                    
-                    <th style="width: 120px;">Hãng</th>      
-                    <th style="width: 150px;">Hành động</th> 
+                    <th style="width: 120px;">Thương hiệu</th>      
+                    <th style="width: 150px;">Thao tác</th> 
                 </tr>
             </thead>
             <tbody id="table_data">
@@ -343,6 +331,11 @@ if (!function_exists('renderBadges')) {
     </div>
 </div>
 
+<?php 
+// 3. INCLUDE FILE THÔNG BÁO (POPUP)
+if(file_exists('thongbao.php')) include 'thongbao.php'; 
+?>
+
 <script>
 $(document).ready(function(){
     var deleteLink = ''; 
@@ -381,3 +374,5 @@ $(document).ready(function(){
     });
 });
 </script>
+</body>
+</html>
