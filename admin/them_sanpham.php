@@ -1,12 +1,17 @@
 <?php
 // =================================================================================
-// === CODE FIX LỖI: BỎ CỘT 'SO_LUONG' VÌ CHƯA CẦN DÙNG ============================
+// === CODE CHỐT: THÊM SP -> GÁN SESSION -> CHUYỂN HƯỚNG VỀ SANPHAM.PHP ============
 // =================================================================================
 
 // Bật hiển thị lỗi để debug
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
+
+// 1. START SESSION ĐỂ TRUYỀN THÔNG BÁO SANG TRANG DANH SÁCH
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 require_once '../connect.php'; 
 
@@ -15,34 +20,29 @@ if (!isset($conn)) {
     else if (isset($db)) $conn = $db;
 }
 
-// 1. Lấy danh mục
+// 2. Lấy danh mục & Thương hiệu cho Select box
 $stmt_dm = $conn->prepare("SELECT * FROM danhmuc");
 $stmt_dm->execute();
 $list_dm = $stmt_dm->fetchAll(PDO::FETCH_ASSOC);
 
-// 2. Lấy thương hiệu
 $stmt_th = $conn->prepare("SELECT * FROM thuonghieu");
 $stmt_th->execute();
 $list_th = $stmt_th->fetchAll(PDO::FETCH_ASSOC);
 
-$msg_success = false;
 $error_msg = "";
 
+// 3. XỬ LÝ KHI BẤM LƯU
 if (isset($_POST['btn_add'])) {
     try {
         // --- LẤY DỮ LIỆU INPUT ---
         $ten_sp        = $_POST['ten_sanpham'];
         $danhmuc_id    = $_POST['danhmuc_id'];
-        
-        // Xử lý thương hiệu: Nếu rỗng thì cho là NULL
         $thuonghieu_id = !empty($_POST['thuonghieu_id']) ? $_POST['thuonghieu_id'] : null;
-        
         $gia_nhap      = !empty($_POST['gia_nhap']) ? $_POST['gia_nhap'] : 0;
         $gia_ban       = !empty($_POST['gia_ban']) ? $_POST['gia_ban'] : 0;
         $gia_km        = !empty($_POST['gia_khuyenmai']) ? $_POST['gia_khuyenmai'] : 0;
         $mo_ta         = $_POST['mo_ta'];
         
-        // Lấy chuỗi nhập tay màu & size
         $str_mau_sac    = isset($_POST['mau_sac']) ? $_POST['mau_sac'] : '';
         $str_kich_thuoc = isset($_POST['kich_thuoc']) ? $_POST['kich_thuoc'] : '';
 
@@ -59,7 +59,6 @@ if (isset($_POST['btn_add'])) {
             }
         }
 
-        // Bắt đầu giao dịch (Transaction)
         $conn->beginTransaction(); 
 
         // --- BƯỚC 1: INSERT VÀO BẢNG SANPHAM ---
@@ -81,20 +80,18 @@ if (isset($_POST['btn_add'])) {
         // --- BƯỚC 2: LẤY ID CỦA SẢN PHẨM VỪA TẠO ---
         $new_sp_id = $conn->lastInsertId();
 
-        // --- BƯỚC 3: TẠO BIẾN THỂ (CHỈ LƯU MÀU & SIZE - KHÔNG LƯU SỐ LƯỢNG) ---
+        // --- BƯỚC 3: TẠO BIẾN THỂ (KHÔNG CÓ CỘT SO_LUONG) ---
         $arr_mau  = array_filter(array_map('trim', explode(',', $str_mau_sac)));
         $arr_size = array_filter(array_map('trim', explode(',', $str_kich_thuoc)));
 
         if (empty($arr_mau))  $arr_mau = ['']; 
         if (empty($arr_size)) $arr_size = [''];
 
-        // --- SỬA LẠI SQL: Bỏ cột so_luong ---
         $sql_variant = "INSERT INTO bienthe_sanpham (sanpham_id, mau_sac, kich_thuoc) VALUES (:sp_id, :mau, :size)";
         $stmt_var = $conn->prepare($sql_variant);
 
         foreach ($arr_mau as $mau) {
             foreach ($arr_size as $size) {
-                // Chỉ lưu nếu có ít nhất màu hoặc size, hoặc cả 2 rỗng (sản phẩm đơn giản)
                 $stmt_var->execute([
                     ':sp_id' => $new_sp_id,
                     ':mau'   => $mau,
@@ -104,7 +101,13 @@ if (isset($_POST['btn_add'])) {
         }
 
         $conn->commit(); 
-        $msg_success = true;
+        
+        // ============================================================
+        // === LOGIC MỚI: GÁN SESSION VÀ CHUYỂN HƯỚNG NGAY ===
+        // ============================================================
+        $_SESSION['success_msg'] = "Đã thêm mới sản phẩm <b>$ten_sp</b> thành công!";
+        header("Location: sanpham.php");
+        exit;
 
     } catch (Exception $e) {
         $conn->rollBack();
@@ -254,13 +257,6 @@ if (isset($_POST['btn_add'])) {
     </div>
 </div>
 
-<div id="toast">
-    <div class="toast-icon">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-    </div>
-    <div class="toast-message">Đã thêm sản phẩm thành công!</div>
-</div>
-
 <script>
     const imageInput = document.getElementById('imageInput');
     const imagePreview = document.getElementById('imagePreview');
@@ -282,19 +278,6 @@ if (isset($_POST['btn_add'])) {
             noImageText.style.display = 'inline';
         }
     });
-
-    <?php if($msg_success): ?>
-    document.addEventListener("DOMContentLoaded", function() {
-        var x = document.getElementById("toast");
-        x.className = "show";
-        setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
-        
-        document.getElementById('addProductForm').reset();
-        imagePreview.src = '#';
-        imagePreview.style.display = 'none';
-        noImageText.style.display = 'inline';
-    });
-    <?php endif; ?>
 </script>
 
 </body>
