@@ -3,6 +3,15 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+// --- 1. KẾT NỐI CSDL ---
+if (!isset($conn)) {
+    if (file_exists('connect.php')) {
+        require_once 'connect.php';
+    } elseif (file_exists('../connect.php')) {
+        require_once '../connect.php';
+    }
+}
+
 // Kiểm tra quyền Admin
 if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] != 1) {
     header("Location: ../login.php"); 
@@ -11,25 +20,21 @@ if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] != 1) {
 
 $admin_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : 'Admin';
 
-// --- LOGIC MỚI: LẤY THÔNG BÁO CHO DROPDOWN (PDO) ---
+// --- 2. LOGIC LẤY THÔNG BÁO BAN ĐẦU (Để hiện ngay khi load trang) ---
 $new_msg = 0;
 $list_notif = [];
 
-if (isset($conn)) {
-    try {
-        // 1. Đếm tổng số tin chưa xem
+try {
+    if (isset($conn)) { 
         $stmt_count = $conn->query("SELECT COUNT(*) as solhuong FROM lienhe WHERE trang_thai = 0");
         $row_count = $stmt_count->fetch(PDO::FETCH_ASSOC);
         $new_msg = $row_count['solhuong'];
 
-        // 2. Lấy 5 tin nhắn mới nhất (kể cả đã xem hay chưa xem, ưu tiên chưa xem lên đầu)
-        // Logic: Sắp xếp trạng thái (0 lên trước), sau đó đến ngày gửi mới nhất
         $stmt_list = $conn->query("SELECT * FROM lienhe ORDER BY trang_thai ASC, ngay_gui DESC LIMIT 5");
         $list_notif = $stmt_list->fetchAll(PDO::FETCH_ASSOC);
-
-    } catch(PDOException $e) {
-        $new_msg = 0;
     }
+} catch(PDOException $e) {
+    $new_msg = 0;
 }
 ?>
 
@@ -67,8 +72,9 @@ if (isset($conn)) {
         <li class="menu-item">
             <a href="#" class="menu-link"><i class="fa-solid fa-box-open"></i> Đơn hàng <i class="fa-solid fa-chevron-down arrow-down"></i></a>
             <ul class="dropdown">
-                <li><a href="tonkho.php">Quản lý đơn hàng</a></li>
-                <li><a href="nhapkho.php">Quản lý đổi trả</a></li>
+                <li><a href="donhang.php">Quản lý đơn hàng</a></li>
+                <li><a href="doitra.php">Quản lý đổi trả</a></li>
+                <li><a href="phieuxuat.php">Quản lý phiếu xuất</a></li>
             </ul>
         </li>
         <li class="menu-item">
@@ -92,22 +98,21 @@ if (isset($conn)) {
         <div class="notif-wrapper">
             <div class="notif-icon" onclick="toggleNotif(event)">
                 <i class="fa-solid fa-bell"></i>
-                <?php if($new_msg > 0): ?>
-                    <span class="badge"><?php echo $new_msg; ?></span>
-                <?php endif; ?>
+                <span class="badge" id="notifBadge" style="display: <?php echo ($new_msg > 0) ? 'flex' : 'none'; ?>">
+                    <?php echo $new_msg; ?>
+                </span>
             </div>
 
             <div class="notif-dropdown" id="notifBox">
                 <div class="notif-header">
                     <span>Thông báo mới</span>
-                    <small><?php echo $new_msg; ?> tin mới</small>
+                    <small id="notifTextCount"><?php echo $new_msg; ?> tin mới</small>
                 </div>
                 
-                <div class="notif-body">
+                <div class="notif-body" id="notifListBody">
                     <?php if(count($list_notif) > 0): ?>
                         <?php foreach($list_notif as $item): ?>
                             <?php 
-                                // Tô đậm nếu chưa đọc
                                 $style_unread = ($item['trang_thai'] == 0) ? 'background:#fff3e0;' : ''; 
                             ?>
                             <a href="phanhoi.php?id=<?php echo $item['id']; ?>" class="notif-item" style="<?php echo $style_unread; ?>">
@@ -148,19 +153,88 @@ if (isset($conn)) {
 
 <script>
     function toggleNotif(event) {
-        event.stopPropagation(); // Ngăn click lan ra ngoài
+        event.stopPropagation();
         var box = document.getElementById("notifBox");
-        box.classList.toggle("active"); // Thêm/Bớt class active để hiện/ẩn
+        box.classList.toggle("active");
     }
 
-    // Bấm ra ngoài màn hình thì tự tắt menu
     window.onclick = function(event) {
         var box = document.getElementById("notifBox");
-        // Nếu click không trúng vào cái chuông hoặc cái hộp
         if (!event.target.closest('.notif-wrapper')) {
             if (box && box.classList.contains('active')) {
                 box.classList.remove('active');
             }
         }
+    }
+
+    // --- SCRIPT AJAX TỰ ĐỘNG CẬP NHẬT (MỚI THÊM VÀO) ---
+    // Cứ 3 giây (3000ms) sẽ tự động chạy đoạn này
+    setInterval(function() {
+        fetch('get_notif.php') // Gọi file PHP lấy dữ liệu
+        .then(response => response.json())
+        .then(data => {
+            // 1. Cập nhật số lượng đỏ (Badge)
+            const badge = document.getElementById('notifBadge');
+            const textCount = document.getElementById('notifTextCount');
+            
+            if (data.count > 0) {
+                badge.innerText = data.count;
+                badge.style.display = 'flex'; // Hiện badge
+                textCount.innerText = data.count + ' tin mới';
+            } else {
+                badge.style.display = 'none'; // Ẩn badge
+                textCount.innerText = '0 tin mới';
+            }
+
+            // 2. Cập nhật danh sách tin nhắn
+            const listBody = document.getElementById('notifListBody');
+            let htmlContent = '';
+
+            if (data.list.length > 0) {
+                data.list.forEach(item => {
+                    // Xử lý định dạng ngày tháng
+                    const dateObj = new Date(item.ngay_gui);
+                    const dateStr = dateObj.getDate().toString().padStart(2,'0') + '/' + 
+                                    (dateObj.getMonth()+1).toString().padStart(2,'0') + ' ' + 
+                                    dateObj.getHours().toString().padStart(2,'0') + ':' + 
+                                    dateObj.getMinutes().toString().padStart(2,'0');
+                    
+                    // Nếu chưa đọc (trang_thai = 0) thì có nền màu cam nhạt
+                    const bgStyle = (item.trang_thai == 0) ? 'background:#fff3e0;' : '';
+
+                    // Tạo HTML cho từng dòng tin nhắn
+                    htmlContent += `
+                        <a href="phanhoi.php?id=${item.id}" class="notif-item" style="${bgStyle}">
+                            <div class="notif-item-top">
+                                <span class="notif-name">${escapeHtml(item.ho_ten)}</span>
+                                <span class="notif-time">${dateStr}</span>
+                            </div>
+                            <span class="notif-content">${escapeHtml(item.noi_dung)}</span>
+                        </a>
+                    `;
+                });
+            } else {
+                htmlContent = `
+                    <div style="padding: 20px; text-align: center; color: #999;">
+                        <i class="fa-regular fa-envelope-open" style="font-size:20px; margin-bottom:5px;"></i><br>
+                        Không có tin nhắn nào
+                    </div>
+                `;
+            }
+            // Gán HTML mới vào hộp thông báo
+            listBody.innerHTML = htmlContent;
+        })
+        .catch(error => console.error('Error:', error));
+    }, 3000); // 3000ms = 3 giây
+
+    // Hàm phụ để bảo mật, chống lỗi hiển thị khi có ký tự lạ
+    function escapeHtml(text) {
+        if (!text) return "";
+        return text
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
     }
 </script>
