@@ -2,30 +2,29 @@
 session_start();
 require_once 'connect.php'; 
 
-if (!isset($_GET['id']) || empty($_GET['id'])) { die("Không tìm thấy sản phẩm!"); }
-$product_id = $_GET['id'];
+// 1. Kiểm tra ID sản phẩm
+if (!isset($_GET['id']) || empty($_GET['id'])) { 
+    die("Không tìm thấy sản phẩm!"); 
+}
+$product_id = intval($_GET['id']);
 
-try {
-    // Lấy thông tin sản phẩm
-    $sql = "SELECT * FROM sanpham WHERE id = :id";
-    $stmt = $conn->prepare($sql);
-    $stmt->bindParam(':id', $product_id);
-    $stmt->execute();
-    $product = $stmt->fetch(PDO::FETCH_ASSOC);
+// 2. Lấy thông tin sản phẩm
+$stmt = $conn->prepare("SELECT * FROM sanpham WHERE id = :id");
+$stmt->execute(['id' => $product_id]);
+$product = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if (!$product) { die("Sản phẩm không tồn tại!"); }
+if (!$product) { die("Sản phẩm không tồn tại!"); }
 
-    // Lấy biến thể (Size/Màu) có số lượng > 0
-    $sql_variant = "SELECT * FROM bienthe_sanpham WHERE sanpham_id = :id AND so_luong_ton > 0";
-    $stmt_var = $conn->prepare($sql_variant);
-    $stmt_var->bindParam(':id', $product_id);
-    $stmt_var->execute();
-    $variants = $stmt_var->fetchAll(PDO::FETCH_ASSOC);
+// 3. Lấy các biến thể (Màu sắc, Kích thước)
+$stmt_var = $conn->prepare("SELECT * FROM bienthe_sanpham WHERE sanpham_id = :id AND so_luong_ton > 0");
+$stmt_var->execute(['id' => $product_id]);
+$variants = $stmt_var->fetchAll(PDO::FETCH_ASSOC);
 
-} catch (PDOException $e) { die("Lỗi: " . $e->getMessage()); }
+// Tách mảng Màu và Size (loại bỏ trùng lặp)
+$colors = array_unique(array_column($variants, 'mau_sac'));
+$sizes = array_unique(array_column($variants, 'kich_thuoc'));
 
 $img_src = !empty($product['hinh_anh']) ? "assets/images/" . $product['hinh_anh'] : "assets/images/no-image.png";
-$gia_hien_tai = ($product['gia_khuyenmai'] > 0) ? $product['gia_khuyenmai'] : $product['gia_ban'];
 ?>
 
 <!DOCTYPE html>
@@ -33,116 +32,145 @@ $gia_hien_tai = ($product['gia_khuyenmai'] > 0) ? $product['gia_khuyenmai'] : $p
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo $product['ten_sanpham']; ?></title>
+    <title><?php echo $product['ten_sanpham']; ?> - HBG Shop</title>
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="assets/css/style.css"> 
+    <link rel="stylesheet" href="assets/css/style.css">
     <link rel="stylesheet" href="assets/css/menu.css">
     <link rel="stylesheet" href="assets/css/footer.css">
-    
-    <style>
-        .container-detail { width: 1100px; margin: 30px auto; display: flex; gap: 40px; }
-        .detail-left { width: 45%; }
-        .main-image { width: 100%; border: 1px solid #eee; padding: 10px; border-radius: 8px; }
-        .detail-right { width: 55%; }
-        .product-title { font-size: 26px; font-weight: bold; margin-bottom: 15px; }
-        .product-price { font-size: 24px; color: #d0021b; font-weight: bold; margin-bottom: 20px; }
-        .product-price del { color: #999; font-size: 16px; margin-left: 10px; font-weight: normal; }
-        
-        .variant-section { margin-bottom: 20px; }
-        .variant-label { font-weight: bold; margin-bottom: 8px; display: block; }
-        .variant-options { display: flex; gap: 10px; flex-wrap: wrap; }
-        .variant-btn { padding: 8px 15px; border: 1px solid #ccc; cursor: pointer; background: #fff; border-radius: 4px; user-select: none; }
-        .variant-btn.active { border-color: #ff6600; background-color: #fff5f0; color: #ff6600; font-weight: bold; }
-        
-        .quantity-input { width: 60px; padding: 8px; text-align: center; border: 1px solid #ccc; border-radius: 4px; }
-        .btn-buy-now { background: #ff6600; color: white; padding: 12px 40px; border: none; border-radius: 5px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 20px; transition: 0.3s; }
-        .btn-buy-now:hover { background: #e65c00; }
-        
-        .tech-specs { margin-top: 40px; border-top: 1px solid #eee; padding-top: 20px; }
-        .spec-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        .spec-table td { padding: 10px; border-bottom: 1px solid #f0f0f0; }
-        .spec-table td:first-child { font-weight: bold; width: 150px; background: #f9f9f9; }
-        input[type="radio"] { display: none; }
-    </style>
+    <link rel="stylesheet" href="assets/css/chitiet.css"> 
 </head>
 <body>
 
     <?php include 'includes/header.php'; ?>
 
-    <main>
-        <div class="container-detail">
-            <div class="detail-left">
-                <img src="<?php echo $img_src; ?>" alt="<?php echo $product['ten_sanpham']; ?>" class="main-image">
-            </div>
-
-            <div class="detail-right">
-                <h1 class="product-title"><?php echo $product['ten_sanpham']; ?></h1>
-                
-                <div class="product-price">
-                    <?php echo number_format($gia_hien_tai, 0, ',', '.'); ?>đ
-                    <?php if ($product['gia_khuyenmai'] > 0 && $product['gia_khuyenmai'] < $product['gia_ban']): ?>
-                        <del><?php echo number_format($product['gia_ban'], 0, ',', '.'); ?>đ</del>
-                    <?php endif; ?>
+    <main class="container">
+        <form id="addToCartForm" action="includes/xulygiohang.php" method="POST">
+            <input type="hidden" name="action" value="add">
+            <input type="hidden" name="product_id" value="<?php echo $product['id']; ?>">
+            
+            <div class="product-detail-container">
+                <div class="product-image-col">
+                    <img src="<?php echo $img_src; ?>" alt="<?php echo $product['ten_sanpham']; ?>">
                 </div>
 
-                <form action="giohang_xuly.php" method="POST">
-                    <input type="hidden" name="product_id" value="<?php echo $product['id']; ?>">
+                <div class="product-info-col">
+                    <h1 class="product-title"><?php echo $product['ten_sanpham']; ?></h1>
                     
-                    <?php if (count($variants) > 0): ?>
-                        <div class="variant-section">
-                            <span class="variant-label">Chọn phân loại:</span>
-                            <div class="variant-options">
-                                <?php foreach ($variants as $index => $var): ?>
-                                    <label class="variant-btn <?php echo ($index === 0) ? 'active' : ''; ?>" onclick="selectVariant(this)">
-                                        <input type="radio" name="variant_id" value="<?php echo $var['id']; ?>" <?php echo ($index === 0) ? 'checked' : ''; ?>>
-                                        <?php echo $var['kich_thuoc']; if(!empty($var['mau_sac'])) echo " - " . $var['mau_sac']; ?>
-                                    </label>
-                                <?php endforeach; ?>
-                            </div>
-                        </div>
-                        
-                        <div style="margin-top: 20px;">
-                            <span class="variant-label">Số lượng:</span>
-                            <input type="number" name="quantity" class="quantity-input" value="1" min="1" max="10">
-                        </div>
-
-                        <button type="submit" class="btn-buy-now"><i class="fa-solid fa-cart-plus"></i> THÊM VÀO GIỎ</button>
-                    <?php else: ?>
-                        <p style="color: red; font-weight: bold; font-size: 18px;">Hiện đang hết hàng!</p>
-                    <?php endif; ?>
-                </form>
-
-                <?php 
-                $thong_so = json_decode($product['thong_so_ky_thuat'], true);
-                if ($thong_so) {
-                ?>
-                    <div class="tech-specs">
-                        <h3>Thông số kỹ thuật</h3>
-                        <table class="spec-table">
-                            <?php foreach ($thong_so as $key => $value): ?>
-                            <tr><td><?php echo ucfirst(str_replace('_', ' ', $key)); ?></td><td><?php echo $value; ?></td></tr>
-                            <?php endforeach; ?>
-                        </table>
+                    <div class="product-price">
+                        <?php if($product['gia_khuyenmai'] > 0): ?>
+                            <span style="text-decoration: line-through; color: #999; font-size: 18px; margin-right: 10px;">
+                                <?php echo number_format($product['gia_ban'], 0, ',', '.'); ?>đ
+                            </span>
+                            <span><?php echo number_format($product['gia_khuyenmai'], 0, ',', '.'); ?>đ</span>
+                        <?php else: ?>
+                            <span><?php echo number_format($product['gia_ban'], 0, ',', '.'); ?>đ</span>
+                        <?php endif; ?>
                     </div>
-                <?php } ?>
+
+                    <?php if(!empty($colors) && !empty($colors[0])): ?>
+                    <div class="variant-group">
+                        <label class="variant-label">Màu sắc:</label>
+                        <div class="variant-options">
+                            <?php foreach($colors as $k => $c): ?>
+                                <div class="variant-option">
+                                    <input type="radio" name="color" id="color_<?php echo $k; ?>" value="<?php echo $c; ?>" <?php echo ($k==0)?'checked':''; ?>>
+                                    <label for="color_<?php echo $k; ?>"><?php echo $c; ?></label>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+                    <?php endif; ?>
+
+                    <?php if(!empty($sizes) && !empty($sizes[0])): ?>
+                    <div class="variant-group">
+                        <label class="variant-label">Kích thước:</label>
+                        <div class="variant-options">
+                            <?php foreach($sizes as $k => $s): ?>
+                                <div class="variant-option">
+                                    <input type="radio" name="size" id="size_<?php echo $k; ?>" value="<?php echo $s; ?>" <?php echo ($k==0)?'checked':''; ?>>
+                                    <label for="size_<?php echo $k; ?>"><?php echo $s; ?></label>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+                    <?php endif; ?>
+
+                    <div class="variant-group" style="display: flex; align-items: center; margin-top: 20px;">
+                        <label class="variant-label" style="margin-bottom: 0; margin-right: 15px;">Số lượng:</label>
+                        <div style="display: flex;">
+                            <input type="number" name="quantity" class="qty-input" value="1" min="1">
+                        </div>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button type="button" class="btn-add-cart" onclick="showCartPopup()">
+                            <i class="fa-solid fa-cart-plus"></i> Thêm Vào Giỏ Hàng
+                        </button>
+                        
+                        <button type="submit" name="buy_now" class="btn-buy-now">
+                            MUA NGAY
+                        </button>
+                    </div>
+                </div>
             </div>
-        </div>
-        
-        <div style="width: 1100px; margin: 0 auto 50px; padding: 0 15px;">
-            <h3>Mô tả chi tiết</h3>
-            <hr>
-            <div style="margin-top: 15px; line-height: 1.6;">
+        </form>
+
+        <div style="background: #fff; padding: 20px; margin-top: 20px; border-radius: 8px;">
+            <h3 style="border-bottom: 2px solid #ff6600; display: inline-block; padding-bottom: 5px; margin-bottom: 20px;">
+                Mô tả sản phẩm
+            </h3>
+            <div style="line-height: 1.6;">
                 <?php echo $product['mo_ta']; ?>
             </div>
         </div>
+
     </main>
 
     <?php include 'includes/footer.php'; ?>
 
+    <div id="cartModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-icon"><i class="fa-solid fa-circle-check"></i></div>
+            <div class="modal-text">Sản phẩm đã được thêm vào Giỏ hàng</div>
+            <div class="modal-actions">
+                <a href="#" class="btn-continue" onclick="closeCartPopup()">Tiếp tục mua sắm</a>
+                <a href="giohang.php" class="btn-view-cart">Xem giỏ hàng</a>
+            </div>
+        </div>
+    </div>
+
     <script>
-        function selectVariant(label) {
-            document.querySelectorAll('.variant-btn').forEach(btn => btn.classList.remove('active'));
-            label.classList.add('active');
+        function showCartPopup() {
+            const form = document.getElementById('addToCartForm');
+            const formData = new FormData(form);
+
+            fetch('includes/xulygiohang.php', {
+                method: 'POST',
+                body: formData,
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    document.getElementById('cartModal').style.display = 'block';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+        function closeCartPopup() {
+            document.getElementById('cartModal').style.display = 'none';
+            event.preventDefault(); 
+        }
+
+        window.onclick = function(event) {
+            var modal = document.getElementById('cartModal');
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
         }
     </script>
 </body>

@@ -1,0 +1,97 @@
+/* --- assets/css/chitiet.css --- */
+
+/* Bố cục trang chi tiết */
+.product-detail-container {
+    display: flex;
+    gap: 40px;
+    margin-top: 30px;
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+}
+
+.product-image-col { width: 40%; }
+.product-image-col img { width: 100%; object-fit: cover; border: 1px solid #eee; }
+
+.product-info-col { width: 60%; }
+.product-title { font-size: 24px; font-weight: bold; margin-bottom: 15px; text-transform: uppercase; }
+.product-price { color: #ff6600; font-size: 28px; font-weight: bold; margin-bottom: 20px; }
+
+/* Phần chọn Biến thể (Màu/Size) */
+.variant-group { margin-bottom: 20px; }
+.variant-label { font-weight: bold; margin-bottom: 8px; display: block; }
+.variant-options { display: flex; gap: 10px; flex-wrap: wrap; }
+
+/* Radio Button giả làm nút bấm */
+.variant-option input { display: none; } /* Ẩn nút radio thật */
+.variant-option label {
+    border: 1px solid #ddd;
+    padding: 8px 15px;
+    cursor: pointer;
+    background: #fff;
+    transition: 0.3s;
+    min-width: 40px;
+    text-align: center;
+}
+.variant-option input:checked + label {
+    border-color: #ff6600;
+    color: #ff6600;
+    font-weight: bold;
+    background: #fff5f0;
+}
+.variant-option label:hover { border-color: #ff6600; }
+
+/* Input số lượng */
+.qty-input {
+    width: 60px; padding: 5px; text-align: center; border: 1px solid #ddd; margin-right: 10px;
+}
+
+/* NÚT MUA HÀNG (QUAN TRỌNG) */
+.action-buttons { display: flex; gap: 15px; margin-top: 30px; }
+
+.btn-add-cart {
+    flex: 1;
+    padding: 15px;
+    background: rgba(255, 87, 34, 0.1); /* Màu cam nhạt */
+    color: #ff6600;
+    border: 1px solid #ff6600;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center; justify-content: center; gap: 10px;
+    transition: 0.3s;
+}
+.btn-add-cart:hover { background: rgba(255, 87, 34, 0.2); }
+
+.btn-buy-now {
+    flex: 1;
+    padding: 15px;
+    background: #ff6600;
+    color: white;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
+.btn-buy-now:hover { background: #e65c00; }
+
+/* POPUP THÔNG BÁO (MODAL) */
+.modal-overlay {
+    display: none; /* Mặc định ẩn */
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.5); z-index: 1000;
+}
+.modal-content {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    background: #fff; padding: 30px; border-radius: 5px; text-align: center;
+    width: 400px;
+}
+.modal-icon { font-size: 50px; color: #28a745; margin-bottom: 15px; }
+.modal-text { font-size: 18px; margin-bottom: 25px; }
+.modal-actions { display: flex; gap: 10px; justify-content: center; }
+.btn-view-cart {
+    background: #ff6600; color: #fff; padding: 10px 20px; text-decoration: none; border-radius: 4px;
+}
+.btn-continue {
+    background: #eee; color: #333; padding: 10px 20px; text-decoration: none; border-radius: 4px;
+}

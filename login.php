@@ -6,30 +6,36 @@ $error_message = '';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     
-    $email = $_POST['username']; 
+    // SỬA: Lấy giá trị tên đăng nhập thay vì email
+    $username_input = $_POST['username']; 
     $password_input = $_POST['password'];
 
     // 1. Mã hóa mật khẩu người dùng nhập vào thành MD5 để so sánh
     $password_md5 = md5($password_input);
 
     try {
-        // 2. Tìm user trong database bằng Email và Mật khẩu (đã mã hóa)
-        $sql = "SELECT * FROM user WHERE email = :email AND password = :password";
+        // 2. SỬA: Tìm user trong database bằng cột 'name' thay vì 'email'
+        $sql = "SELECT * FROM user WHERE name = :username AND password = :password";
         $stmt = $conn->prepare($sql);
         
-        $stmt->bindParam(':email', $email);
+        // SỬA: Bind tham số theo username
+        $stmt->bindParam(':username', $username_input);
         $stmt->bindParam(':password', $password_md5); // So sánh chuỗi MD5
         
         $stmt->execute();
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        // 3. Nếu tìm thấy user (tức là Email đúng và Pass đúng)
+        // 3. Nếu tìm thấy user (tức là Tên đăng nhập đúng và Pass đúng)
         if ($user) {
             
             // Lưu Session
+            // Lưu ý: Đảm bảo tên cột trong DB khớp với code này (id, name, quyenhan)
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['user_name'] = $user['name'];
             $_SESSION['user_role'] = $user['quyenhan'];
+            
+            // Lưu thêm tên đầy đủ để hiển thị cho đẹp (nếu cần)
+            $_SESSION['user_fullname'] = $user['tendaydu']; 
 
             // 4. Phân quyền chuyển hướng
             if ($user['quyenhan'] == 1) {
@@ -42,7 +48,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             exit();
 
         } else {
-            $error_message = "Email hoặc Mật khẩu không chính xác!";
+            // SỬA: Thông báo lỗi phù hợp hơn
+            $error_message = "Tên đăng nhập hoặc Mật khẩu không chính xác!";
         }
 
     } catch (PDOException $e) {
@@ -80,7 +87,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
             <form action="" method="POST">
                 <div class="form-group">
-                    <input type="text" name="username" placeholder="Email" required value="<?php echo isset($_POST['username']) ? $_POST['username'] : ''; ?>">
+                    <input type="text" name="username" placeholder="Tên đăng nhập" required value="<?php echo isset($_POST['username']) ? $_POST['username'] : ''; ?>">
                 </div>
                 
                 <div class="form-group">
