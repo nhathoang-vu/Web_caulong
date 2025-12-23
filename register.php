@@ -1,8 +1,9 @@
 <?php
     // 1. Gọi file kết nối database
-    include 'connect.php';
+    require_once 'connect.php';
 
     $errors = []; // Mảng chứa lỗi
+    $name = $email = $sdt = ''; // Khởi tạo biến để tránh lỗi undefined khi load trang lần đầu
 
     // Kiểm tra xem người dùng đã bấm nút đăng ký chưa
     if (isset($_POST['btn_reg'])) {
@@ -20,15 +21,15 @@
             $errors[] = "Vui lòng nhập đầy đủ thông tin bắt buộc (*)";
         }
 
-        // 2. Validate mật khẩu (Regex)
-        // Lưu ý: Nếu muốn test nhanh có thể tạm đóng phần này lại
+        // 2. Validate mật khẩu (Giữ nguyên logic kiểm tra độ mạnh của bạn)
         if (!preg_match('/[A-Z]/', $pass)) {
             $errors[] = "Mật khẩu phải chứa ít nhất 1 ký tự IN HOA.";
         }
         if (!preg_match('/[0-9]/', $pass)) {
             $errors[] = "Mật khẩu phải chứa ít nhất 1 chữ số.";
         }
-        if (!preg_match('/[\W]/', $pass)) { // \W là ký tự không phải chữ và số (ký tự đặc biệt)
+        // Nếu muốn bỏ kiểm tra ký tự đặc biệt thì comment dòng dưới
+        if (!preg_match('/[\W]/', $pass)) { 
             $errors[] = "Mật khẩu phải chứa ít nhất 1 ký tự đặc biệt.";
         }
         if (strlen($pass) < 6) {
@@ -40,25 +41,36 @@
             $errors[] = "Mật khẩu nhập lại không khớp!";
         }
 
-        // 4. Kiểm tra Email đã tồn tại chưa
+        // 4. Kiểm tra Email VÀ Tên đăng nhập đã tồn tại chưa
+        // (Rất quan trọng vì bạn đăng nhập bằng Name)
         if (empty($errors)) {
             try {
-                $stmt = $conn->prepare("SELECT email FROM user WHERE email = :email"); 
-                $stmt->execute(['email' => $email]);
-                $checkEmail = $stmt->fetch();
+                $sql = "SELECT name, email FROM user WHERE email = :email OR name = :name";
+                $stmt = $conn->prepare($sql); 
+                $stmt->execute([
+                    ':email' => $email,
+                    ':name'  => $name
+                ]);
+                $existingUser = $stmt->fetch(PDO::FETCH_ASSOC);
 
-                if ($checkEmail) {
-                    $errors[] = "Email này đã được sử dụng, vui lòng chọn email khác!";
+                if ($existingUser) {
+                    if ($existingUser['email'] === $email) {
+                        $errors[] = "Email này đã được sử dụng, vui lòng chọn email khác!";
+                    }
+                    if ($existingUser['name'] === $name) {
+                        $errors[] = "Tên đăng nhập '$name' đã tồn tại, vui lòng chọn tên khác!";
+                    }
                 }
             } catch(PDOException $e) {
-                $errors[] = "Lỗi kiểm tra email: " . $e->getMessage();
+                $errors[] = "Lỗi kiểm tra dữ liệu: " . $e->getMessage();
             }
         }
 
         // --- THÊM VÀO CSDL ---
         if (empty($errors)) {
-            // Mã hóa mật khẩu an toàn (Thay thế MD5)
-            $pass_hash = password_hash($pass, PASSWORD_DEFAULT);
+            
+            // --- THAY ĐỔI: DÙNG MD5 THEO YÊU CẦU ---
+            $pass_hash = md5($pass);
             
             // Mặc định quyền hạn là 0 (Khách hàng)
             $quyenhan = 0; 
@@ -68,11 +80,11 @@
                 $stmt = $conn->prepare($sql);
                 
                 $result = $stmt->execute([
-                    'name' => $name,
-                    'pass' => $pass_hash, // Lưu mật khẩu đã mã hóa
-                    'email' => $email,
-                    'sdt' => $sdt,
-                    'quyenhan' => $quyenhan
+                    ':name' => $name,
+                    ':pass' => $pass_hash, // Lưu mật khẩu MD5
+                    ':email' => $email,
+                    ':sdt' => $sdt,
+                    ':quyenhan' => $quyenhan
                 ]);
 
                 if ($result) {
@@ -119,21 +131,21 @@
             <form action="" method="POST">
                 
                 <div class="form-group">
-                    <label>Họ và tên (*)</label>
-                    <input type="text" name="name" placeholder="Nhập họ tên" required 
-                           value="<?php echo isset($name) ? $name : '' ?>">
+                    <label>Tên đăng nhập (*)</label>
+                    <input type="text" name="name" placeholder="Nhập tên đăng nhập" required 
+                           value="<?php echo htmlspecialchars($name); ?>">
                 </div>
 
                 <div class="form-group">
                     <label>Email (*)</label>
                     <input type="email" name="email" placeholder="Nhập email" required 
-                           value="<?php echo isset($email) ? $email : '' ?>">
+                           value="<?php echo htmlspecialchars($email); ?>">
                 </div>
 
                 <div class="form-group">
                     <label>Số điện thoại</label>
                     <input type="text" name="sdt" placeholder="Nhập số điện thoại" 
-                           value="<?php echo isset($sdt) ? $sdt : '' ?>">
+                           value="<?php echo htmlspecialchars($sdt); ?>">
                 </div>
 
                 <div class="form-group">

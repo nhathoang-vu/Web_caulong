@@ -29,6 +29,7 @@
         </div>
 
         <div class="header-actions">
+            
             <a href="#" class="action-item">
                 <div class="icon-circle">
                     <i class="fa-solid fa-binoculars"></i>
@@ -36,23 +37,41 @@
                 <span>Tra cứu</span>
             </a>
 
-            <a href="login.php" class="action-item">
-                <div class="icon-circle">
-                    <i class="fa-solid fa-user"></i>
-                </div>
-                <span>Tài khoản</span>
-            </a>
+            <?php if (isset($_SESSION['user_name'])): ?>
+                
+                <div class="action-item user-dropdown-parent">
+                    <div class="user-info-trigger">
+                        <div class="icon-circle">
+                            <i class="fa-solid fa-user"></i>
+                        </div>
+                        <span><?php echo $_SESSION['user_name']; ?></span>
+                    </div>
 
-            <a href="cart.php" class="action-item">
+                    <ul class="user-dropdown-menu">
+                        <li><a href="profile.php">Trang cá nhân</a></li>
+                        <li><a href="logout.php">Đăng xuất</a></li>
+                    </ul>
+                </div>
+
+            <?php else: ?>
+                
+                <a href="login.php" class="action-item">
+                    <div class="icon-circle">
+                        <i class="fa-solid fa-user"></i>
+                    </div>
+                    <span>Tài khoản</span>
+                </a>
+
+            <?php endif; ?>
+            <a href="giohang.php" class="action-item">
                 <div class="icon-circle">
                     <i class="fa-solid fa-cart-shopping"></i>
                     <span class="cart-badge"><?php echo isset($_SESSION['cart']) ? count($_SESSION['cart']) : 0; ?></span> 
                 </div>
                 <span>Giỏ hàng</span>
             </a>
-        </div>
-    </div>
-</header>
+            
+        </div> </div> </header>
 
 <nav class="main-menu-bar">
     <div class="container-menu"> 
@@ -72,7 +91,7 @@
             </li>
 
             <li class="menu-item">
-<a href="#">Hướng dẫn <i class="fa-solid fa-chevron-down"></i></a>
+                <a href="#">Hướng dẫn <i class="fa-solid fa-chevron-down"></i></a>
                 <ul class="sub-menu">
                     <li><a href="hdtt.php">Hướng dẫn thanh toán</a></li>
                     <li><a href="hdmh.php">Hướng dẫn mua hàng</a></li>
