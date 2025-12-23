@@ -1,12 +1,17 @@
 <?php
 // =================================================================================
-// === CODE CHỐT: SỬA SẢN PHẨM (LOGIC TÁCH BẢNG + SYNC BIẾN THỂ) ===================
+// === CODE CHỐT: SỬA SP -> GÁN SESSION -> CHUYỂN HƯỚNG VỀ SANPHAM.PHP =============
 // =================================================================================
 
-// Bật hiển thị lỗi
+// Bật hiển thị lỗi để debug nếu cần
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
+
+// Bắt buộc start session để truyền thông báo sang trang kia
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 require_once '../connect.php'; 
 
@@ -23,31 +28,31 @@ if (!isset($_GET['id']) || empty($_GET['id'])) {
 
 $id = $_GET['id'];
 
-// 2. LẤY DỮ LIỆU SẢN PHẨM (Thông tin chung)
+// 2. LẤY DỮ LIỆU SẢN PHẨM
 $stmt = $conn->prepare("SELECT * FROM sanpham WHERE id = :id");
 $stmt->execute([':id' => $id]);
 $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$row) {
-    echo "<script>alert('Sản phẩm không tồn tại!'); window.location='sanpham.php';</script>";
+    // Nếu không thấy SP thì đá về danh sách
+    header("Location: sanpham.php");
     exit;
 }
 
-// --- MỚI: LẤY DỮ LIỆU BIẾN THỂ ĐỂ HIỂN THỊ RA Ô INPUT ---
+// --- LẤY DỮ LIỆU BIẾN THỂ ĐỂ HIỂN THỊ ---
 // Lấy danh sách màu
 $stmt_mau = $conn->prepare("SELECT DISTINCT mau_sac FROM bienthe_sanpham WHERE sanpham_id = :id AND mau_sac != ''");
 $stmt_mau->execute([':id' => $id]);
 $arr_mau_db = $stmt_mau->fetchAll(PDO::FETCH_COLUMN);
-$str_mau_hien_tai = implode(', ', $arr_mau_db); // VD: "Đỏ, Xanh"
+$str_mau_hien_tai = implode(', ', $arr_mau_db); 
 
 // Lấy danh sách size
 $stmt_size = $conn->prepare("SELECT DISTINCT kich_thuoc FROM bienthe_sanpham WHERE sanpham_id = :id AND kich_thuoc != ''");
 $stmt_size->execute([':id' => $id]);
 $arr_size_db = $stmt_size->fetchAll(PDO::FETCH_COLUMN);
-$str_size_hien_tai = implode(', ', $arr_size_db); // VD: "L, XL"
+$str_size_hien_tai = implode(', ', $arr_size_db); 
 
-
-// 3. LẤY DANH MỤC & THƯƠNG HIỆU
+// 3. LẤY DANH MỤC & THƯƠNG HIỆU CHO SELECT BOX
 $stmt_dm = $conn->prepare("SELECT * FROM danhmuc");
 $stmt_dm->execute();
 $list_dm = $stmt_dm->fetchAll(PDO::FETCH_ASSOC);
@@ -56,7 +61,6 @@ $stmt_th = $conn->prepare("SELECT * FROM thuonghieu");
 $stmt_th->execute();
 $list_th = $stmt_th->fetchAll(PDO::FETCH_ASSOC);
 
-$msg_success = false;
 $error_msg = "";
 
 // 4. XỬ LÝ KHI BẤM LƯU
@@ -70,12 +74,11 @@ if (isset($_POST['btn_update'])) {
         $gia_km        = !empty($_POST['gia_khuyenmai']) ? $_POST['gia_khuyenmai'] : 0;
         $mo_ta         = $_POST['mo_ta'];
         
-        // Lấy chuỗi màu/size mới từ input
         $str_mau_new  = isset($_POST['mau_sac']) ? $_POST['mau_sac'] : '';
         $str_size_new = isset($_POST['kich_thuoc']) ? $_POST['kich_thuoc'] : '';
 
         // Xử lý ảnh
-        $hinh_anh = $row['hinh_anh']; // Mặc định giữ ảnh cũ
+        $hinh_anh = $row['hinh_anh']; 
         if (isset($_FILES['hinh_anh']) && $_FILES['hinh_anh']['name'] != "") {
             $target_dir = "anh_sanpham/"; 
             if (!file_exists($target_dir)) mkdir($target_dir, 0777, true); 
@@ -87,8 +90,7 @@ if (isset($_POST['btn_update'])) {
 
         $conn->beginTransaction();
 
-        // --- BƯỚC A: UPDATE BẢNG SANPHAM (Thông tin chung) ---
-        // Lưu ý: Đã bỏ cột thong_so, kich_thuoc trong bảng này
+        // A. Update bảng sanpham
         $sql = "UPDATE sanpham SET 
                 ten_sanpham = :ten, 
                 danhmuc_id = :dm, 
@@ -107,43 +109,37 @@ if (isset($_POST['btn_update'])) {
             ':img' => $hinh_anh, ':mt' => $mo_ta, ':id' => $id
         ]);
 
-        // --- BƯỚC B: CẬP NHẬT BIẾN THỂ (XÓA CŨ -> TẠO MỚI) ---
-        // 1. Xóa toàn bộ biến thể cũ của sản phẩm này
+        // B. Update biến thể (Xóa cũ -> Thêm mới)
         $stmt_del = $conn->prepare("DELETE FROM bienthe_sanpham WHERE sanpham_id = :id");
         $stmt_del->execute([':id' => $id]);
 
-        // 2. Tạo lại biến thể từ chuỗi nhập mới
         $arr_mau = array_filter(array_map('trim', explode(',', $str_mau_new)));
         $arr_size = array_filter(array_map('trim', explode(',', $str_size_new)));
 
         if (empty($arr_mau)) $arr_mau = ['']; 
         if (empty($arr_size)) $arr_size = [''];
 
-        // Insert lại (Không có cột so_luong)
         $sql_variant = "INSERT INTO bienthe_sanpham (sanpham_id, mau_sac, kich_thuoc) VALUES (:sp_id, :mau, :size)";
         $stmt_var = $conn->prepare($sql_variant);
 
         foreach ($arr_mau as $mau) {
             foreach ($arr_size as $size) {
-                $stmt_var->execute([
-                    ':sp_id' => $id, // ID sản phẩm đang sửa
-                    ':mau'   => $mau,
-                    ':size'  => $size
-                ]);
+                $stmt_var->execute([':sp_id' => $id, ':mau' => $mau, ':size' => $size]);
             }
         }
 
         $conn->commit();
-        $msg_success = true;
 
-        // Cập nhật lại dữ liệu hiển thị sau khi lưu xong
-        $str_mau_hien_tai = $str_mau_new;
-        $str_size_hien_tai = $str_size_new;
-        $row['hinh_anh'] = $hinh_anh; // Cập nhật ảnh hiển thị nếu có đổi
+        // ============================================================
+        // === KHU VỰC QUAN TRỌNG: GÁN SESSION VÀ CHUYỂN HƯỚNG ===
+        // ============================================================
+        $_SESSION['success_msg'] = "Cập nhật sản phẩm <b>$ten_sp</b> thành công!";
+        header("Location: sanpham.php");
+        exit; // Dừng code ngay lập tức để chuyển trang
 
     } catch (PDOException $e) {
         $conn->rollBack();
-        $error_msg = "Lỗi: " . $e->getMessage();
+        $error_msg = "Lỗi hệ thống: " . $e->getMessage();
     }
 }
 ?>
@@ -305,14 +301,8 @@ if (isset($_POST['btn_update'])) {
     </div>
 </div>
 
-<div id="toast">
-    <div class="toast-icon">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-    </div>
-    <div class="toast-message">Đã cập nhật thành công!</div>
-</div>
-
 <script>
+    // Script xem trước ảnh
     const imageInput = document.getElementById('imageInput');
     const imagePreview = document.getElementById('imagePreview');
     const noImageText = document.querySelector('.no-image-text');
@@ -329,16 +319,6 @@ if (isset($_POST['btn_update'])) {
             reader.readAsDataURL(file);
         }
     });
-
-    <?php if($msg_success): ?>
-    document.addEventListener("DOMContentLoaded", function() {
-        var x = document.getElementById("toast");
-        x.className = "show";
-        setTimeout(function(){ 
-            window.location.href = "sanpham.php"; 
-        }, 1500);
-    });
-    <?php endif; ?>
 </script>
 
 </body>

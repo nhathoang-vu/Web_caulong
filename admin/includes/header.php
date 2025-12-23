@@ -48,6 +48,7 @@ if (isset($conn)) {
         <li class="menu-item">
             <a href="#" class="menu-link"><i class="fa-solid fa-box-open"></i> Sản phẩm <i class="fa-solid fa-chevron-down arrow-down"></i></a>
             <ul class="dropdown">
+                <li><a href="sanpham.php">Tất cả danh mục</a></li>
                 <li><a href="sanpham.php?danhmuc=1">Vợt cầu lông</a></li>
                 <li><a href="sanpham.php?danhmuc=2">Giày cầu lông</a></li>
                 <li><a href="sanpham.php?danhmuc=4">Quần áo thể thao</a></li>
@@ -58,7 +59,7 @@ if (isset($conn)) {
         <li class="menu-item">
             <a href="#" class="menu-link"><i class="fa-solid fa-warehouse"></i> Kho hàng <i class="fa-solid fa-chevron-down arrow-down"></i></a>
             <ul class="dropdown">
-                <li><a href="tonkho.php">Danh mục nhà cung cấp</a></li>
+                <li><a href="ncc.php">Danh mục nhà cung cấp</a></li>
                 <li><a href="tonkho.php">Xem tồn kho</a></li>
                 <li><a href="nhapkho.php">Tạo phiếu nhập</a></li>
             </ul>
@@ -78,7 +79,11 @@ if (isset($conn)) {
             </ul>
         </li>
         <li class="menu-item">
-            <a href="phanhoi.php" class="menu-link"><i class="fa-solid fa-comments"></i> Phản hồi</a>
+            <a href="khachhang.php" class="menu-link"><i class="fa-solid fa-comments"></i> Khách hàng <i class="fa-solid fa-chevron-down arrow-down"></i></a>
+            <ul class="dropdown">
+                <li><a href="khachhang.php">Quản lý khách hàng</a></li>
+                <li><a href="phanhoi.php">Phản hồi</a></li>
+            </ul>
         </li>
     </ul>
 
