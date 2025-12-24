@@ -1,43 +1,63 @@
-/* --- FILE: assets/css/sanpham.css --- */
-
-/* 1. Cấu trúc chia cột (Sidebar bên trái, Sản phẩm bên phải) */
+/* =========================================
+   1. CẤU TRÚC CHUNG (LAYOUT)
+   ========================================= */
 .page-container {
     display: flex;
-    gap: 20px;
-    width: 98%;           /* Rộng gần hết màn hình */
-    max-width: 1400px;    /* Giới hạn max để không bị bè quá trên màn hình to */
-    margin: 20px auto;    /* Căn giữa trang */
+    gap: 30px; /* Tăng khoảng cách giữa sidebar và nội dung cho thoáng */
+    width: 95%;
+    max-width: 1400px;
+    margin: 30px auto;
     align-items: flex-start;
-    padding: 0 10px;
+    padding: 0 15px;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 }
 
-/* 2. Sidebar (Khung lọc) */
+/* =========================================
+   2. SIDEBAR (BỘ LỌC) - STYLE HIỆN ĐẠI
+   ========================================= */
 .sidebar {
-    width: 260px;          /* Chiều rộng cố định */
-    flex-shrink: 0;        /* Không bị co lại */
+    width: 270px;
+    flex-shrink: 0;
     background-color: #fff;
-    border: 2px solid #ddd; /* Viền rõ ràng như bạn yêu cầu */
-    border-radius: 8px;
-    padding: 20px;
+    border-radius: 12px; /* Bo góc mềm mại */
+    padding: 25px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05); /* Đổ bóng nhẹ */
+    position: sticky; /* Giữ sidebar khi cuộn chuột (nếu trang dài) */
+    top: 20px;
 }
 
 .filter-group {
-    margin-bottom: 25px;
-    border-bottom: 1px solid #eee;
-    padding-bottom: 15px;
+    margin-bottom: 30px;
+    border-bottom: 1px dashed #eee; /* Đường kẻ đứt nét tinh tế */
+    padding-bottom: 20px;
 }
 
 .filter-group:last-child {
     border-bottom: none;
+    padding-bottom: 0;
 }
 
+/* Tiêu đề bộ lọc có điểm nhấn */
 .filter-title {
-    font-weight: bold;
+    font-weight: 700;
     font-size: 16px;
-    margin-bottom: 12px;
+    margin-bottom: 15px;
     display: block;
-    text-transform: uppercase;
-    color: #333;
+    color: #1a1a1a;
+    position: relative;
+    padding-left: 12px;
+}
+
+/* Kẻ sọc màu cam bên cạnh tiêu đề */
+.filter-title::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 3px;
+    bottom: 3px;
+    width: 4px;
+    background-color: #ea580c;
+    border-radius: 4px;
 }
 
 .filter-list {
@@ -47,161 +67,297 @@
 }
 
 .filter-list li {
-    margin-bottom: 8px;
+    margin-bottom: 12px;
 }
 
-.filter-list label {
+.filter-list li label {
     display: flex;
     align-items: center;
-    gap: 10px;
     cursor: pointer;
     font-size: 14px;
     color: #555;
+    transition: all 0.2s ease;
 }
 
-.filter-list label:hover {
+.filter-list li label:hover {
     color: #ea580c;
+    transform: translateX(5px); /* Hiệu ứng chữ trượt nhẹ sang phải */
 }
 
-.filter-list input[type="checkbox"], 
-.filter-list input[type="radio"] {
-    transform: scale(1.2);
+/* Thanh cuộn đẹp */
+.filter-scroll {
+    max-height: 220px;
+    overflow-y: auto;
+    padding-right: 5px;
+    padding-left: 4px; /* Fix lỗi mất viền */
+    padding-top: 4px;
+    margin-left: -4px;
+}
+
+.filter-scroll::-webkit-scrollbar {
+    width: 4px;
+}
+.filter-scroll::-webkit-scrollbar-thumb {
+    background-color: #ddd;
+    border-radius: 4px;
+}
+
+/* --- CHECKBOX TRÒN HIỆN ĐẠI --- */
+.filter-list input[type="radio"],
+.round-checkbox {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    width: 18px; /* To hơn chút cho dễ bấm */
+    height: 18px;
+    border: 1.5px solid #ccc;
+    border-radius: 50%;
+    outline: none;
     cursor: pointer;
-    accent-color: #ea580c;
+    margin-right: 12px;
+    position: relative;
+    background-color: #fff;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
 }
 
-/* 3. Khu vực chính (Danh sách sản phẩm) */
+.filter-list input[type="radio"]:checked,
+.round-checkbox:checked {
+    border-color: #ea580c;
+    background-color: #ea580c;
+    box-shadow: 0 2px 5px rgba(234, 88, 12, 0.3); /* Bóng cam khi chọn */
+}
+
+.filter-list input[type="radio"]:checked::after,
+.round-checkbox:checked::after {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 8px; height: 8px;
+    background-color: #fff;
+    border-radius: 50%;
+}
+
+.filter-list input[type="radio"]:hover,
+.round-checkbox:hover {
+    border-color: #ea580c;
+}
+
+/* =========================================
+   3. MAIN CONTENT & HEADER
+   ========================================= */
 .main-content {
-    flex-grow: 1; /* Chiếm hết phần còn lại */
+    flex-grow: 1;
 }
 
 .cat-header {
-    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    padding: 15px 20px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.03);
 }
 
-.cat-header h2 {
-    font-size: 24px;
+.cat-header-left h2 {
+    font-size: 22px;
+    color: #1a1a1a;
+    margin-bottom: 4px;
+    font-weight: 700;
+}
+
+.cat-header-left p {
+    color: #777;
+    font-size: 14px;
+}
+
+/* Ô Sắp xếp đẹp hơn */
+.cat-header-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.sort-select {
+    padding: 8px 15px;
+    border: 1px solid #ddd;
+    border-radius: 20px; /* Bo tròn kiểu viên thuốc */
+    outline: none;
+    font-size: 14px;
+    cursor: pointer;
+    background-color: #fff;
     color: #333;
-    margin-bottom: 5px;
+    font-weight: 500;
+    transition: all 0.3s;
 }
 
-/* 4. Lưới sản phẩm (Grid 4 cột) */
+.sort-select:hover, .sort-select:focus {
+    border-color: #ea580c;
+    box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.1);
+}
+
+/* =========================================
+   4. LƯỚI SẢN PHẨM (CARD PRO)
+   ========================================= */
 .sp-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr); /* 4 CỘT BẰNG NHAU */
-    gap: 20px;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 25px;
 }
 
-/* Responsive: Thu nhỏ màn hình thì giảm cột */
-@media (max-width: 1200px) {
-    .sp-grid { grid-template-columns: repeat(3, 1fr); }
-}
-@media (max-width: 768px) {
-    .page-container { flex-direction: column; }
-    .sidebar { width: 100%; }
-    .sp-grid { grid-template-columns: repeat(2, 1fr); }
-}
-
-/* 5. Thẻ sản phẩm (Product Card) */
 .sp-item {
     background: #fff;
-    border: 1px solid #e5e5e5;
-    border-radius: 8px;
+    border-radius: 12px; /* Bo góc lớn hơn */
     overflow: hidden;
-    transition: all 0.3s ease;
-    padding-bottom: 15px;
-    text-align: center;
-    position: relative; /* Để định vị badge giảm giá */
-    display: flex;
-    flex-direction: column;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Hiệu ứng nảy nhẹ */
+    position: relative;
+    border: 1px solid transparent; /* Chuẩn bị cho hover */
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05); /* Bóng mờ mặc định */
 }
 
+/* Hover vào sản phẩm: Nổi lên và có viền cam */
 .sp-item:hover {
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-    border-color: #ea580c;
-    transform: translateY(-3px);
+    transform: translateY(-8px); /* Bay lên cao hơn */
+    box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+    border-color: rgba(234, 88, 12, 0.2);
 }
 
-/* Badge giảm giá (Góc phải trên) */
-.sale-badge {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background-color: #d0021b; /* Màu đỏ */
-    color: #fff;
-    font-size: 12px;
-    font-weight: bold;
-    padding: 4px 8px;
-    border-radius: 4px;
-    z-index: 2;
-}
-
+/* Vùng ảnh */
 .sp-img-box {
     width: 100%;
     height: 220px;
-    overflow: hidden;
+    padding: 20px;
+    background: #fff; /* Nền trắng cho ảnh */
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 10px;
+    position: relative;
+    overflow: hidden;
 }
 
 .sp-img-box img {
-    max-width: 90%;
-    max-height: 90%;
+    max-width: 100%;
+    max-height: 100%;
     object-fit: contain;
-    transition: transform 0.3s;
+    transition: transform 0.5s ease;
 }
 
 .sp-item:hover .sp-img-box img {
-    transform: scale(1.05);
+    transform: scale(1.1); /* Phóng to ảnh mượt mà */
 }
 
+/* Nhãn giảm giá (Sale Badge) */
+.sale-badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: linear-gradient(135deg, #ff6b6b, #ee5253); /* Màu gradient đẹp */
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 20px;
+    z-index: 5;
+    box-shadow: 0 2px 6px rgba(238, 82, 83, 0.4);
+}
+
+/* Tên sản phẩm */
 .sp-name {
-    font-size: 15px;
-    font-weight: 600;
-    margin: 0 10px 5px;
-    line-height: 1.4;
-    height: 42px; /* Giới hạn 2 dòng */
+    padding: 0 15px;
+    margin-bottom: 8px;
+    height: 44px; /* Giới hạn chiều cao */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
     overflow: hidden;
 }
 
 .sp-name a {
     text-decoration: none;
     color: #333;
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.4;
+    transition: color 0.2s;
 }
 
 .sp-name a:hover {
     color: #ea580c;
 }
 
-/* Khu vực giá tiền */
+/* Giá tiền */
 .sp-price-box {
+    padding: 0 15px 20px; /* Padding dưới nhiều hơn chút */
     display: flex;
-    flex-direction: column; /* Giá mới trên, giá cũ dưới */
-    align-items: center;
-    justify-content: center;
-    gap: 2px;
-    margin-top: auto; /* Đẩy xuống đáy */
+    align-items: baseline; /* Căn chân chữ cho đẹp */
+    gap: 8px;
+    margin-top: auto;
 }
 
 .price-now {
     color: #d0021b;
     font-size: 18px;
-    font-weight: bold;
+    font-weight: 800; /* Chữ đậm hơn */
 }
 
 .price-old {
-    color: #888;
-    font-size: 14px;
+    color: #999;
+    font-size: 13px;
     text-decoration: line-through;
 }
 
+/* Thông báo rỗng */
 .alert-empty {
     grid-column: 1 / -1;
     background-color: #fff3cd;
+    border: 1px solid #ffeeba;
     color: #856404;
-    padding: 15px;
-    border-radius: 5px;
+    padding: 30px;
+    border-radius: 8px;
     text-align: center;
+    font-size: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+.alert-empty::before {
+    content: '\f071'; /* Icon cảnh báo FontAwesome */
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+    font-size: 30px;
+    color: #856404;
+}
+
+/* =========================================
+   5. RESPONSIVE
+   ========================================= */
+@media (max-width: 1200px) {
+    .sp-grid { grid-template-columns: repeat(3, 1fr); }
+    .page-container { gap: 20px; }
+}
+
+@media (max-width: 992px) {
+    .page-container { flex-direction: column; }
+    .sidebar { width: 100%; position: static; margin-bottom: 20px; }
+    
+    /* Trên mobile, chia bộ lọc thành 2 cột cho gọn */
+    .sidebar form {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+    .filter-group { border-bottom: none; margin-bottom: 0; }
+}
+
+@media (max-width: 768px) {
+    .sidebar form { grid-template-columns: 1fr; } /* Về 1 cột */
+    .sp-grid { grid-template-columns: repeat(2, 1fr); gap: 15px; }
+    .cat-header { flex-direction: column; align-items: flex-start; gap: 15px; }
+    .cat-header-right { width: 100%; justify-content: space-between; }
+    .sp-img-box { height: 160px; }
+    .price-now { font-size: 16px; }
 }

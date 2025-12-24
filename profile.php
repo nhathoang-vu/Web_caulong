@@ -25,12 +25,13 @@ try {
     $ten_hien_thi = !empty($user['tendaydu']) ? $user['tendaydu'] : $user['name'];
 
     // 3. Lấy Đơn hàng
+    // ĐÃ SỬA: Đường dẫn ảnh từ 'uploads/' thành 'admin/anh_sanpham/'
     $sqlOrder = "SELECT d.*, 
                  GROUP_CONCAT(
                     CONCAT(
                         '<div class=\"order-item-row\">',
                             '<div class=\"item-thumb\">',
-                                '<img src=\"uploads/', IFNULL(s.hinh_anh, 'no-image.png'), '\" alt=\"sp\" onerror=\"this.onerror=null; this.src=\'https://via.placeholder.com/60x60.png?text=NO+IMG\';\">',
+                                '<img src=\"admin/anh_sanpham/', IFNULL(s.hinh_anh, 'no-image.png'), '\" alt=\"sp\" onerror=\"this.onerror=null; this.src=\'https://via.placeholder.com/60x60.png?text=NO+IMG\';\">',
                             '</div>',
                             '<div class=\"item-info\">',
                                 '<div class=\"item-name\">', REPLACE(IFNULL(s.ten_sanpham, ct.ten_sanpham), '\"', ''), '</div>',
@@ -48,7 +49,7 @@ try {
                  LEFT JOIN sanpham s ON ct.sanpham_id = s.id
                  WHERE d.user_id = :uid
                  GROUP BY d.id
-                 ORDER BY d.id DESC"; // Sắp xếp đơn mới nhất lên đầu
+                 ORDER BY d.trang_thai ASC, d.id DESC";
                  
     $stmtOrder = $conn->prepare($sqlOrder);
     $stmtOrder->execute([':uid' => $user_id]);
