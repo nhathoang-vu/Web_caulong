@@ -1,26 +1,63 @@
 <?php
 // =================================================================================
-// === TRANG TẠO PHIẾU NHẬP (MODAL XÁC NHẬN CHUYÊN NGHIỆP) ========================
+// === TRANG TẠO PHIẾU NHẬP (FULL OPTION: AJAX SEARCH + AUTO PRICE) ===============
 // =================================================================================
 session_start();
 require_once '../connect.php'; 
 
-// --- 1. LẤY DỮ LIỆU TỪ DATABASE ---
-$nccs = $conn->query("SELECT * FROM thuonghieu")->fetchAll(PDO::FETCH_ASSOC);
+// --- 0. API AJAX: TÌM KIẾM SẢN PHẨM & LẤY GIÁ NHẬP ---
+if (isset($_GET['action']) && $_GET['action'] == 'search_products') {
+    header('Content-Type: application/json');
+    
+    $keyword = isset($_GET['q']) ? $_GET['q'] : '';
+    $brand_id = isset($_GET['brand_id']) ? $_GET['brand_id'] : 0;
 
-$sql_products = "SELECT 
-                    bt.id as bienthe_id, 
+    try {
+        // Lấy thông tin sản phẩm kèm giá nhập
+        $sql = "SELECT 
+                    bt.id as id, 
                     sp.id as sanpham_id,
                     sp.ten_sanpham, 
                     bt.mau_sac, 
                     bt.kich_thuoc,
-                    sp.hinh_anh
-                 FROM bienthe_sanpham bt
-                 JOIN sanpham sp ON bt.sanpham_id = sp.id
-                 ORDER BY sp.ten_sanpham ASC";
-$variants = $conn->query($sql_products)->fetchAll(PDO::FETCH_ASSOC);
+                    sp.gia_nhap  
+                FROM bienthe_sanpham bt
+                JOIN sanpham sp ON bt.sanpham_id = sp.id
+                WHERE sp.thuonghieu_id = :brand_id 
+                AND sp.ten_sanpham LIKE :keyword
+                LIMIT 20";
 
-// --- 2. XỬ LÝ LƯU PHIẾU ---
+        $stmt = $conn->prepare($sql);
+        $stmt->execute([
+            ':brand_id' => $brand_id,
+            ':keyword' => "%$keyword%"
+        ]);
+        $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $results = [];
+        foreach ($products as $p) {
+            $attr = $p['mau_sac'] . ' - ' . $p['kich_thuoc'];
+            // Format kết quả trả về cho Select2
+            $results[] = [
+                'id' => $p['id'], 
+                'text' => $p['ten_sanpham'] . " (" . $attr . ")",
+                'spid' => $p['sanpham_id'],
+                'name_sp' => $p['ten_sanpham'],
+                'attr_sp' => $attr,
+                'price_import' => $p['gia_nhap'] // Truyền giá nhập xuống Client
+            ];
+        }
+        echo json_encode(['results' => $results]);
+    } catch (Exception $e) {
+        echo json_encode(['results' => []]);
+    }
+    exit; 
+}
+
+// --- 1. LẤY DANH SÁCH NHÀ CUNG CẤP ---
+$nccs = $conn->query("SELECT * FROM thuonghieu")->fetchAll(PDO::FETCH_ASSOC);
+
+// --- 2. XỬ LÝ LƯU PHIẾU NHẬP ---
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['action'] == 'save_import') {
     try {
         $thuonghieu_id = $_POST['thuonghieu_id'];
@@ -34,6 +71,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
         $conn->beginTransaction();
 
         foreach ($items as $item) {
+            // Lưu vào bảng phiếu nhập
             $stmt = $conn->prepare("INSERT INTO phieunhap (ma_phieu, thuonghieu_id, sanpham_id, bienthe_id, so_luong, don_gia, thanh_tien, ngay_tao) 
                                     VALUES (:ma, :th, :sp, :bt, :sl, :dg, :tt, :nt)");
             $stmt->execute([
@@ -47,11 +85,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
                 ':nt' => $ngay_tao
             ]);
 
+            // Cập nhật số lượng tồn kho
             $stmt_update = $conn->prepare("UPDATE bienthe_sanpham SET so_luong_ton = so_luong_ton + :sl WHERE id = :id");
             $stmt_update->execute([':sl' => $item['so_luong'], ':id' => $item['bienthe_id']]);
         }
 
         $conn->commit();
+        // Chuyển hướng sang trang in phiếu (hoặc danh sách)
         header("Location: inphieunhap.php?ma_phieu=" . $ma_phieu);
         exit;
 
@@ -72,53 +112,39 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     
     <style>
-        /* --- CSS CƠ BẢN --- */
+        /* --- CSS GIỮ NGUYÊN 100% --- */
         body { font-family: 'Segoe UI', sans-serif; background-color: #f8fafc; color: #334155; margin: 0; }
         .wrap-content { padding: 30px; max-width: 1200px; margin: 0 auto; }
         
-        /* Header */
         .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 25px; }
         .page-title { font-size: 24px; font-weight: 700; color: #0f172a; margin: 0; }
         .btn-back { text-decoration: none; color: #64748b; font-weight: 500; display: flex; align-items: center; gap: 5px; transition: 0.2s; }
         .btn-back:hover { color: #0f172a; }
 
-        /* Layout */
         .grid-container { display: grid; grid-template-columns: 1fr 1.5fr; gap: 25px; align-items: start; }
         .row-2-col { display: flex; gap: 15px; }
         .col-half { flex: 1; }
 
-        /* Card */
         .card { background: #fff; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; overflow: hidden; }
         .card-header { padding: 15px 20px; background: #fff; border-bottom: 1px solid #f1f5f9; font-weight: 600; color: #334155; display: flex; align-items: center; gap: 10px; }
         .card-body { padding: 20px; }
 
-        /* Inputs */
         .form-group { margin-bottom: 15px; }
         .form-label { display: block; font-size: 13px; font-weight: 600; color: #64748b; margin-bottom: 6px; }
         .form-control { width: 100%; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; box-sizing: border-box; transition: 0.2s; }
         .form-control:focus { border-color: #3b82f6; outline: none; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+        
+        /* Input Readonly: Màu xám, in đậm */
+        .form-control[readonly] { background-color: #f1f5f9; cursor: not-allowed; color: #475569; font-weight: 700; }
+        
         .select2-container .select2-selection--single { height: 42px !important; border: 1px solid #cbd5e1 !important; border-radius: 8px !important; display: flex; align-items: center; }
         .select2-container--default .select2-selection--single .select2-selection__arrow { top: 8px !important; }
 
-        /* --- BUTTON STYLES (XANH BIỂN) --- */
-        .btn { 
-            border: none; border-radius: 8px; font-weight: 600; cursor: pointer; 
-            transition: all 0.2s ease; font-size: 14px; 
-            display: inline-flex; align-items: center; justify-content: center; 
-            gap: 8px; width: 100%; text-decoration: none; padding: 12px;
-        }
-
-        /* Style chung cho nút Thêm và nút Lưu */
-        .btn-add, .btn-save { 
-            background-color: #eef2f7; color: #4a69bd; margin-top: 15px;
-        }
-        .btn-add:hover, .btn-save:hover { 
-            background-color: #4a69bd; color: #fff; 
-            transform: translateY(-2px); box-shadow: 0 4px 12px rgba(74, 105, 189, 0.2);
-        }
+        .btn { border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; font-size: 14px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%; text-decoration: none; padding: 12px; }
+        .btn-add, .btn-save { background-color: #eef2f7; color: #4a69bd; margin-top: 15px; }
+        .btn-add:hover, .btn-save:hover { background-color: #4a69bd; color: #fff; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(74, 105, 189, 0.2); }
         .btn-save { margin-top: 20px; font-size: 15px; text-transform: uppercase; }
 
-        /* Table */
         .table-wrapper { max-height: 400px; overflow-y: auto; border: 1px solid #f1f5f9; border-radius: 8px; }
         .custom-table { width: 100%; border-collapse: collapse; }
         .custom-table th { background: #f8fafc; color: #64748b; font-size: 12px; text-transform: uppercase; font-weight: 700; padding: 12px 15px; text-align: left; position: sticky; top: 0; z-index: 10; border-bottom: 1px solid #e2e8f0; }
@@ -133,41 +159,25 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
         .total-label { font-size: 16px; font-weight: 600; color: #64748b; }
         .total-value { font-size: 24px; font-weight: 800; color: #dc2626; }
 
-        /* --- TOAST NOTIFICATION --- */
+        /* Toast & Modal */
         #toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; }
         .toast { min-width: 300px; padding: 16px 20px; margin-bottom: 10px; background: #fff; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 12px; transform: translateX(120%); transition: transform 0.3s ease; font-size: 14px; font-weight: 500; }
         .toast.show { transform: translateX(0); }
         .toast.error { border-left: 5px solid #ef4444; color: #b91c1c; }
         .toast.success { border-left: 5px solid #22c55e; color: #15803d; }
 
-        /* --- MODAL CONFIRM (HỘP THOẠI XÁC NHẬN) --- */
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5); z-index: 10000;
-            display: none; align-items: center; justify-content: center;
-            opacity: 0; transition: opacity 0.3s;
-        }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 10000; display: none; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s; }
         .modal-overlay.show { display: flex; opacity: 1; }
-        
-        .modal-box {
-            background: #fff; width: 400px; max-width: 90%;
-            padding: 25px; border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-            text-align: center; transform: translateY(-20px); transition: transform 0.3s;
-        }
+        .modal-box { background: #fff; width: 400px; max-width: 90%; padding: 25px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); text-align: center; transform: translateY(-20px); transition: transform 0.3s; }
         .modal-overlay.show .modal-box { transform: translateY(0); }
-
         .modal-title { font-size: 20px; font-weight: 700; color: #0f172a; margin-bottom: 10px; }
         .modal-desc { font-size: 14px; color: #64748b; margin-bottom: 25px; line-height: 1.5; }
-        
         .modal-actions { display: flex; gap: 10px; justify-content: center; }
         .btn-modal { padding: 10px 20px; border-radius: 6px; font-weight: 600; cursor: pointer; border: none; font-size: 14px; }
         .btn-modal-cancel { background: #f1f5f9; color: #64748b; }
         .btn-modal-cancel:hover { background: #e2e8f0; color: #334155; }
-        
         .btn-modal-confirm { background: #4a69bd; color: #fff; }
         .btn-modal-confirm:hover { background: #3c5aa6; box-shadow: 0 4px 10px rgba(74, 105, 189, 0.3); }
-
     </style>
 </head>
 <body>
@@ -221,7 +231,8 @@ elseif (file_exists('header.php')) include 'header.php';
                 <div class="card-body">
                     <div class="form-group" style="margin-bottom: 0;">
                         <label class="form-label">Chọn nhà cung cấp</label>
-                        <select id="thuonghieu_id" class="form-control select2">
+                        <select id="thuonghieu_id" class="form-control select2" onchange="resetProductSelect()">
+                            <option value="">-- Chọn thương hiệu --</option>
                             <?php foreach($nccs as $ncc): ?>
                                 <option value="<?php echo $ncc['id']; ?>"><?php echo $ncc['ten_thuonghieu']; ?></option>
                             <?php endforeach; ?>
@@ -237,17 +248,9 @@ elseif (file_exists('header.php')) include 'header.php';
                 </div>
                 <div class="card-body">
                     <div class="form-group">
-                        <label class="form-label">Chọn sản phẩm</label>
-                        <select id="variant_select" class="form-control select2">
-                            <option value="">-- Tìm kiếm sản phẩm --</option>
-                            <?php foreach($variants as $v): ?>
-                                <option value="<?php echo $v['bienthe_id']; ?>" 
-                                        data-spid="<?php echo $v['sanpham_id']; ?>"
-                                        data-name="<?php echo $v['ten_sanpham']; ?>"
-                                        data-attr="<?php echo $v['mau_sac'] . ' - ' . $v['kich_thuoc']; ?>">
-                                    <?php echo $v['ten_sanpham'] . " (" . $v['mau_sac'] . " - " . $v['kich_thuoc'] . ")"; ?>
-                                </option>
-                            <?php endforeach; ?>
+                        <label class="form-label">Tìm & Chọn sản phẩm (Gõ tên để tìm)</label>
+                        <select id="variant_select" class="form-control">
+                            <option value="">-- Vui lòng chọn Nhà cung cấp trước --</option>
                         </select>
                     </div>
 
@@ -260,8 +263,8 @@ elseif (file_exists('header.php')) include 'header.php';
                         </div>
                         <div class="col-half">
                             <div class="form-group">
-                                <label class="form-label">Đơn giá nhập</label>
-                                <input type="number" id="input_dongia" class="form-control" placeholder="VD: 150000">
+                                <label class="form-label">Đơn giá nhập (VNĐ)</label>
+                                <input type="number" id="input_dongia" class="form-control" placeholder="Tự động cập nhật" readonly>
                             </div>
                         </div>
                     </div>
@@ -323,10 +326,57 @@ elseif (file_exists('header.php')) include 'header.php';
 
 <script>
     $(document).ready(function() {
-        $('.select2').select2({ width: '100%' });
+        // Init cho thương hiệu
+        $('#thuonghieu_id').select2({ width: '100%' });
+
+        // Init cho sản phẩm (AJAX)
+        $('#variant_select').select2({
+            width: '100%',
+            placeholder: '-- Nhập tên sản phẩm để tìm --',
+            allowClear: false, // [FIX] Xóa nút X gây lỗi hiển thị
+            ajax: {
+                url: window.location.href, // Gửi về chính trang hiện tại
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    var brand_id = $('#thuonghieu_id').val();
+                    if(!brand_id) return false;
+                    
+                    return {
+                        action: 'search_products',
+                        q: params.term,
+                        brand_id: brand_id
+                    };
+                },
+                processResults: function (data) {
+                    return { results: data.results };
+                },
+                cache: true
+            },
+            language: {
+                noResults: function() { return "Không tìm thấy sản phẩm nào"; },
+                searching: function() { return "Đang tìm kiếm..."; }
+            }
+        });
+
+        // --- SỰ KIỆN TỰ ĐỘNG ĐIỀN GIÁ ---
+        $('#variant_select').on('select2:select', function (e) {
+            var data = e.params.data;
+            if(data.price_import) {
+                $('#input_dongia').val(data.price_import);
+            }
+        });
     });
 
     let cart = []; 
+
+    // --- RESET KHI ĐỔI NCC ---
+    function resetProductSelect() {
+        $('#variant_select').val(null).trigger('change');
+        $('#variant_select').empty(); 
+        $('#input_dongia').val(''); 
+        // [FIX] Đã xóa thông báo Toast ở đây
+    }
 
     // --- TOAST NOTIFICATION ---
     function showToast(type, message) {
@@ -346,21 +396,27 @@ elseif (file_exists('header.php')) include 'header.php';
         }, 3000);
     }
 
-    // --- CART FUNCTIONS ---
+    // --- ADD TO CART ---
     function addToCart() {
-        let variantSelect = $('#variant_select option:selected');
-        let bienthe_id = $('#variant_select').val();
+        let data = $('#variant_select').select2('data')[0];
         
-        if (!bienthe_id) { showToast('error', "Vui lòng chọn sản phẩm trước!"); return; }
+        if (!data || !data.id) { 
+            let brand_id = $('#thuonghieu_id').val();
+            if(!brand_id) showToast('error', "Vui lòng chọn Nhà cung cấp trước!");
+            else showToast('error', "Vui lòng tìm và chọn sản phẩm!"); 
+            return; 
+        }
 
-        let sanpham_id = variantSelect.data('spid');
-        let ten_sanpham = variantSelect.data('name');
-        let phan_loai = variantSelect.data('attr');
+        let bienthe_id = data.id;
+        let sanpham_id = data.spid;
+        let ten_sanpham = data.name_sp;
+        let phan_loai = data.attr_sp;
+        
         let so_luong = parseInt($('#input_soluong').val());
-        let don_gia = parseInt($('#input_dongia').val());
+        let don_gia = parseInt($('#input_dongia').val()); // Lấy từ ô readonly
 
         if (so_luong <= 0 || isNaN(so_luong)) { showToast('error', "Số lượng phải lớn hơn 0"); return; }
-        if (isNaN(don_gia) || don_gia <= 0) { showToast('error', "Vui lòng nhập đơn giá nhập hợp lệ"); return; }
+        if (isNaN(don_gia) || don_gia <= 0) { showToast('error', "Sản phẩm chưa có giá nhập trong hệ thống!"); return; }
 
         let exists = false;
         for(let item of cart) {
@@ -430,9 +486,6 @@ elseif (file_exists('header.php')) include 'header.php';
         $('#display_total').text(total.toLocaleString() + ' đ');
     }
 
-    // --- MODAL & SUBMIT FUNCTIONS ---
-    
-    // 1. Hàm mở Modal (thay thế confirm)
     function openConfirmModal() {
         if (cart.length === 0) {
             showToast('error', "Danh sách đang trống! Vui lòng thêm sản phẩm.");
@@ -441,12 +494,10 @@ elseif (file_exists('header.php')) include 'header.php';
         $('#confirmModal').addClass('show');
     }
 
-    // 2. Hàm đóng Modal
     function closeModal() {
         $('#confirmModal').removeClass('show');
     }
 
-    // 3. Hàm xử lý khi bấm nút "Đồng ý" trong Modal
     function processSubmit() {
         $('#items_json').val(JSON.stringify(cart));
         $('#hidden_ncc').val($('#thuonghieu_id').val());

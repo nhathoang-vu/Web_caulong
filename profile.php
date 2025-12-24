@@ -2,6 +2,9 @@
 session_start();
 require_once 'connect.php'; 
 
+// Tăng giới hạn nối chuỗi để tránh lỗi hiển thị khi đơn hàng có quá nhiều sản phẩm
+$conn->exec("SET SESSION group_concat_max_len = 1000000");
+
 // 1. Check Login
 if (!isset($_SESSION['user_id'])) {
     if (isset($_SESSION['user']['id'])) {
@@ -145,10 +148,13 @@ try {
                                                     <td class="text-center">
                                                         <?php 
                                                             $stt = $order['trang_thai'];
-                                                            $cls = 'badge-new'; $txt = 'Mới đặt';
-                                                            if($stt==1){ $cls='badge-info'; $txt='Đã xác nhận'; }
+                                                            $cls = 'badge-secondary'; $txt = 'Không xác định';
+                                                            
+                                                            // Logic hiển thị badge trạng thái
+                                                            if($stt==0){ $cls='badge-warning'; $txt='Mới đặt'; }
+                                                            elseif($stt==1){ $cls='badge-info'; $txt='Đã xác nhận'; }
                                                             elseif($stt==2){ $cls='badge-primary'; $txt='Đang giao'; }
-                                                            elseif($stt==3){ $cls='badge-success'; $txt='Hoàn thành'; }
+                                                            elseif($stt==3){ $cls='badge-success'; $txt='Giao thành công'; }
                                                             elseif($stt==4){ $cls='badge-danger'; $txt='Đã hủy'; }
                                                         ?>
                                                         <div style="margin-bottom: 8px;">
@@ -157,9 +163,21 @@ try {
                                                             </span>
                                                         </div>
 
-                                                        <?php if ($stt == 0 || $stt == 1 || $stt == 2): ?>
+                                                        <?php 
+                                                        // --- LOGIC NÚT BẤM (Sửa theo yêu cầu) ---
+                                                        // Cho phép Hủy/Trả khi trạng thái là 0, 1, 2 hoặc 3
+                                                        if (in_array($stt, [0, 1, 2, 3])): 
+                                                            // Đổi tên nút cho hợp ngữ cảnh (Trải nghiệm người dùng tốt hơn)
+                                                            if ($stt == 2 || $stt == 3) {
+                                                                $btnLabel = "Yêu cầu trả hàng";
+                                                                $btnIcon  = "fa-rotate-left";
+                                                            } else {
+                                                                $btnLabel = "Hủy đơn";
+                                                                $btnIcon  = "fa-xmark";
+                                                            }
+                                                        ?>
                                                             <button type="button" class="btn-cancel-order" onclick="openCancelModal(<?php echo $order['id']; ?>)">
-                                                                <i class="fa-solid fa-xmark"></i> Hủy đơn
+                                                                <i class="fa-solid <?php echo $btnIcon; ?>"></i> <?php echo $btnLabel; ?>
                                                             </button>
                                                         <?php endif; ?>
                                                     </td>
@@ -185,17 +203,17 @@ try {
     <div id="cancelModal" class="modal-overlay">
         <div class="modal-content">
             <span class="close-modal" onclick="closeCancelModal()">&times;</span>
-            <h3>Xác nhận hủy đơn hàng</h3>
-            <p>Shipper sẽ buồn lắm đó! Bạn cho shop biết lý do nhé:</p>
+            <h3>Xác nhận Hủy / Trả hàng</h3>
+            <p>Vui lòng nhập lý do để chúng tôi hỗ trợ bạn tốt nhất:</p>
             
             <form action="cancel_order.php" method="POST">
                 <input type="hidden" name="order_id" id="modal_order_id" value="">
                 
-                <textarea name="ly_do" class="modal-textarea" rows="4" placeholder="VD: Đổi địa chỉ, đặt nhầm sản phẩm..." required></textarea>
+                <textarea name="ly_do" class="modal-textarea" rows="4" placeholder="VD: Đổi địa chỉ, đặt nhầm, hàng lỗi..." required></textarea>
                 
                 <div class="modal-actions">
                     <button type="button" class="btn-secondary" onclick="closeCancelModal()">Đóng</button>
-                    <button type="submit" class="btn-danger">Xác nhận hủy</button>
+                    <button type="submit" class="btn-danger">Gửi yêu cầu</button>
                 </div>
             </form>
         </div>
