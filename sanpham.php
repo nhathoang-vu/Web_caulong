@@ -3,7 +3,13 @@ session_start();
 require_once 'connect.php'; 
 
 // --- 1. NHẬN DỮ LIỆU ---
-$dm_id = isset($_GET['dm_id']) ? intval($_GET['dm_id']) : 0;
+if (isset($_GET['dm_id'])) {
+    $dm_id = intval($_GET['dm_id']);
+} elseif (isset($_GET['danhmuc'])) {
+    $dm_id = intval($_GET['danhmuc']);
+} else {
+    $dm_id = 0;
+}
 $th_ids = isset($_GET['th']) ? $_GET['th'] : [];
 $sizes = isset($_GET['size']) ? $_GET['size'] : []; 
 $muc_gia = isset($_GET['gia']) ? $_GET['gia'] : '';
@@ -29,10 +35,18 @@ $list_thuonghieu = $conn->query($sql_th)->fetchAll(PDO::FETCH_ASSOC);
 // B. Kích thước (CỐ ĐỊNH)
 $list_sizes = [];
 if ($dm_id == 1) { 
+    // Vợt
     $list_sizes = ['2U', '3U', '4U', '5U'];
 } elseif ($dm_id == 2) { 
+    // Giày
     $list_sizes = range(36, 44);
-} 
+} elseif ($dm_id == 3) { 
+    // Quần Áo (Thêm mới)
+    $list_sizes = ['S', 'M', 'L', 'XL', '2XL'];
+} elseif ($dm_id == 4) { 
+    // Quần Áo (Thêm mới)
+    $list_sizes = ['S', 'M', 'L', 'XL', '2XL'];
+}
 
 // --- 4. TRUY VẤN SẢN PHẨM ---
 $sql = "SELECT * FROM sanpham WHERE 1=1";
