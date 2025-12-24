@@ -63,7 +63,7 @@ if (isset($_SESSION['cart']) && count($_SESSION['cart']) > 0) {
                         $img_name = isset($item['img']) ? $item['img'] : (isset($item['image']) ? $item['image'] : '');
                         
                         // 2. Tạo đường dẫn file thực tế
-                        $target_file = 'assets/images/products/' . $img_name;
+                        $target_file = 'admin/anh_sanpham/' . $img_name;
                         
                         // 3. Kiểm tra file có tồn tại không
                         if (!empty($img_name) && file_exists($target_file)) {

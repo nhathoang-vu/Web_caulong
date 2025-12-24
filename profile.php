@@ -25,6 +25,7 @@ try {
     $ten_hien_thi = !empty($user['tendaydu']) ? $user['tendaydu'] : $user['name'];
 
     // 3. Lấy Đơn hàng
+    // ĐÃ SỬA: Đường dẫn ảnh từ 'uploads/' thành 'admin/anh_sanpham/'
     $sqlOrder = "SELECT d.*, 
                  GROUP_CONCAT(
                     CONCAT(
@@ -49,7 +50,7 @@ try {
                  LEFT JOIN sanpham s ON ct.sanpham_id = s.id
                  WHERE d.user_id = :uid
                  GROUP BY d.id
-                 ORDER BY d.id DESC"; // Sắp xếp đơn mới nhất lên đầu
+                 ORDER BY d.trang_thai ASC, d.id DESC";
                  
     $stmtOrder = $conn->prepare($sqlOrder);
     $stmtOrder->execute([':uid' => $user_id]);
