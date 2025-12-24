@@ -121,7 +121,7 @@ if ($user_id > 0) {
                                 // XỬ LÝ ẢNH TRONG PHP (Tránh lỗi nhấp nháy JS)
                                 // Kiểm tra kỹ key lưu ảnh trong session là 'img' hay 'image'
                                 $img_file = isset($item['img']) ? $item['img'] : (isset($item['image']) ? $item['image'] : '');
-                                $img_path = 'assets/images/products/' . $img_file; 
+                                $img_path = 'admin/anh_sanpham/' . $img_file; 
                                 
                                 // Kiểm tra file có tồn tại trên host không
                                 if (empty($img_file) || !file_exists($img_path)) {
