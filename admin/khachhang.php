@@ -1,6 +1,6 @@
 <?php
 // =================================================================================
-// === QUẢN LÝ KHÁCH HÀNG (SỬA LẠI THEO ĐÚNG DUMP SQL) =============================
+// === QUẢN LÝ KHÁCH HÀNG (ĐÃ FIX LỖI SQL LỊCH SỬ ĐƠN HÀNG) ========================
 // =================================================================================
 session_start();
 require_once '../connect.php'; 
@@ -12,20 +12,19 @@ if (!isset($conn)) {
 }
 
 // ---------------------------------------------------------------------------------
-// 1. XỬ LÝ AJAX: XEM LỊCH SỬ MUA HÀNG
+// 1. XỬ LÝ AJAX: XEM LỊCH SỬ MUA HÀNG (FIXED)
 // ---------------------------------------------------------------------------------
 if (isset($_POST['action']) && $_POST['action'] == 'view_history') {
     $user_id = $_POST['user_id'];
     
-    // Cấu trúc: donhang -> chitiet_donhang -> sanpham
-    // Lưu ý: trang_thai trong DB là số (1,2,3,0)
+    // [FIX]: Đã xóa ctdh.mau_sac và ctdh.kich_thuoc vì trong bảng chitiet_donhang không có 2 cột này
     $sql_history = "SELECT 
                         dh.id as donhang_id,
                         dh.ngay_dat,
                         dh.tong_tien,
                         dh.trang_thai,
                         GROUP_CONCAT(
-                            CONCAT(sp.ten_sanpham, ' - ', COALESCE(ctdh.mau_sac,''), ' size ', COALESCE(ctdh.kich_thuoc,''), ' (x', ctdh.so_luong, ')') 
+                            CONCAT(sp.ten_sanpham, ' (x', ctdh.so_luong, ')') 
                             SEPARATOR '<br>'
                         ) as chi_tiet_sp
                     FROM donhang dh
@@ -53,7 +52,7 @@ if (isset($_POST['action']) && $_POST['action'] == 'view_history') {
                 </thead>
                 <tbody>';
         foreach ($history as $order) {
-            // Xử lý trạng thái từ số sang chữ (Theo comment trong SQL: 1: Mới, 2: Giao, 3: Xong, 0: Hủy)
+            // Xử lý trạng thái từ số sang chữ (1: Mới, 2: Giao, 3: Xong, 0: Hủy)
             $status_text = 'Không xác định';
             $status_bg = '#6c757d';
 
@@ -84,8 +83,6 @@ if (isset($_POST['action']) && $_POST['action'] == 'view_history') {
 // ---------------------------------------------------------------------------------
 function getCustomers($conn, $keyword = '') {
     // Chỉ lấy quyenhan = 0 (Khách hàng)
-    // Tổng chi tiêu chỉ tính đơn hoàn thành (trang_thai = 3) hoặc khác hủy (!= 0) tùy chính sách. Ở đây lấy khác hủy.
-    
     $sql = "SELECT 
                 u.id, 
                 u.name, 
