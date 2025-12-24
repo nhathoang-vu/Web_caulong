@@ -1,0 +1,207 @@
+/* --- FILE: assets/css/sanpham.css --- */
+
+/* 1. Cấu trúc chia cột (Sidebar bên trái, Sản phẩm bên phải) */
+.page-container {
+    display: flex;
+    gap: 20px;
+    width: 98%;           /* Rộng gần hết màn hình */
+    max-width: 1400px;    /* Giới hạn max để không bị bè quá trên màn hình to */
+    margin: 20px auto;    /* Căn giữa trang */
+    align-items: flex-start;
+    padding: 0 10px;
+}
+
+/* 2. Sidebar (Khung lọc) */
+.sidebar {
+    width: 260px;          /* Chiều rộng cố định */
+    flex-shrink: 0;        /* Không bị co lại */
+    background-color: #fff;
+    border: 2px solid #ddd; /* Viền rõ ràng như bạn yêu cầu */
+    border-radius: 8px;
+    padding: 20px;
+}
+
+.filter-group {
+    margin-bottom: 25px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 15px;
+}
+
+.filter-group:last-child {
+    border-bottom: none;
+}
+
+.filter-title {
+    font-weight: bold;
+    font-size: 16px;
+    margin-bottom: 12px;
+    display: block;
+    text-transform: uppercase;
+    color: #333;
+}
+
+.filter-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.filter-list li {
+    margin-bottom: 8px;
+}
+
+.filter-list label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #555;
+}
+
+.filter-list label:hover {
+    color: #ea580c;
+}
+
+.filter-list input[type="checkbox"], 
+.filter-list input[type="radio"] {
+    transform: scale(1.2);
+    cursor: pointer;
+    accent-color: #ea580c;
+}
+
+/* 3. Khu vực chính (Danh sách sản phẩm) */
+.main-content {
+    flex-grow: 1; /* Chiếm hết phần còn lại */
+}
+
+.cat-header {
+    margin-bottom: 20px;
+}
+
+.cat-header h2 {
+    font-size: 24px;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+/* 4. Lưới sản phẩm (Grid 4 cột) */
+.sp-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* 4 CỘT BẰNG NHAU */
+    gap: 20px;
+}
+
+/* Responsive: Thu nhỏ màn hình thì giảm cột */
+@media (max-width: 1200px) {
+    .sp-grid { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 768px) {
+    .page-container { flex-direction: column; }
+    .sidebar { width: 100%; }
+    .sp-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* 5. Thẻ sản phẩm (Product Card) */
+.sp-item {
+    background: #fff;
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    padding-bottom: 15px;
+    text-align: center;
+    position: relative; /* Để định vị badge giảm giá */
+    display: flex;
+    flex-direction: column;
+}
+
+.sp-item:hover {
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    border-color: #ea580c;
+    transform: translateY(-3px);
+}
+
+/* Badge giảm giá (Góc phải trên) */
+.sale-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: #d0021b; /* Màu đỏ */
+    color: #fff;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 4px 8px;
+    border-radius: 4px;
+    z-index: 2;
+}
+
+.sp-img-box {
+    width: 100%;
+    height: 220px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+}
+
+.sp-img-box img {
+    max-width: 90%;
+    max-height: 90%;
+    object-fit: contain;
+    transition: transform 0.3s;
+}
+
+.sp-item:hover .sp-img-box img {
+    transform: scale(1.05);
+}
+
+.sp-name {
+    font-size: 15px;
+    font-weight: 600;
+    margin: 0 10px 5px;
+    line-height: 1.4;
+    height: 42px; /* Giới hạn 2 dòng */
+    overflow: hidden;
+}
+
+.sp-name a {
+    text-decoration: none;
+    color: #333;
+}
+
+.sp-name a:hover {
+    color: #ea580c;
+}
+
+/* Khu vực giá tiền */
+.sp-price-box {
+    display: flex;
+    flex-direction: column; /* Giá mới trên, giá cũ dưới */
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    margin-top: auto; /* Đẩy xuống đáy */
+}
+
+.price-now {
+    color: #d0021b;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.price-old {
+    color: #888;
+    font-size: 14px;
+    text-decoration: line-through;
+}
+
+.alert-empty {
+    grid-column: 1 / -1;
+    background-color: #fff3cd;
+    color: #856404;
+    padding: 15px;
+    border-radius: 5px;
+    text-align: center;
+}

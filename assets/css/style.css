@@ -7,14 +7,14 @@
 }
 
 body {
-  background-color: #f9f9f9; /* Màu nền nhẹ cho toàn trang */
+  background-color: #f9f9f9;
 }
 
 /* --- Header Styles --- */
 .main-header {
   background-color: #fff;
   border-bottom: 1px solid #ddd;
-  padding: 5x 0; /* Giảm padding trên dưới một chút */
+  padding: 5px 0;
   width: 100%;
 }
 
@@ -24,52 +24,31 @@ body {
   margin: 0;
   display: flex;
   align-items: center;
-
-  /* QUAN TRỌNG: Đổi từ space-between thành flex-start */
   justify-content: flex-start;
-
   padding: 0 30px;
 }
 
-/* 1. Logo (Đã chỉnh sửa cho logo to) */
-/* 1. Logo */
 /* 1. Logo Area */
-/* 1. Logo Area */
-/* Sửa lại phần này */
-/* --- Sửa trong file style.css --- */
-
-/* --- Trong file style.css --- */
-
-/* --- Trong file style.css --- */
-
-/* --- Trong file style.css --- */
-/* --- Trong file style.css --- */
 .logo-area {
   height: 90px;
   width: auto;
   min-width: 150px;
   display: flex;
   align-items: center;
-
-  /* SỬA DÒNG NÀY: Giảm từ 60px xuống 20px (hoặc 10px nếu muốn gần hơn nữa) */
   margin-right: 20px;
 }
 
-/* 2. Tăng kích thước logo và XÓA BỎ chữ !important */
 .logo-img {
-  height: 80px; /* Tăng từ 50px lên 80px */
+  height: 80px;
   width: auto;
   object-fit: contain;
   display: block;
-  /* LƯU Ý: Đã xóa chữ !important đi rồi nhé */
 }
+
 /* 2. Info Section (Hotline) */
-/* --- Trong file style.css --- */
 .header-info {
   display: flex;
   gap: 25px;
-
-  /* SỬA DÒNG NÀY: Đổi thành 0 (hoặc xóa hẳn dòng này đi) */
   margin-left: 0;
 }
 
@@ -77,7 +56,7 @@ body {
   display: flex;
   align-items: center;
   gap: 10px;
-  font-size: 14px; /* Tăng nhẹ cỡ chữ */
+  font-size: 14px;
   font-weight: bold;
   color: #333;
 }
@@ -98,15 +77,10 @@ body {
   font-size: 16px;
 }
 
-/* 3. Search Bar (Đã làm to hơn) */
+/* 3. Search Bar */
 .search-area {
-  /* Đổi flex-grow thành 0 để không bị giãn quá đà */
   flex-grow: 0;
-
-  /* Đặt chiều rộng cố định để "độ dài không thay đổi" */
   width: 500px;
-
-  /* Căn chỉnh khoảng cách: Cách Hotline 40px, cách Giỏ hàng 40px */
   margin: 0 40px;
 }
 .search-form {
@@ -114,7 +88,7 @@ body {
   background-color: #f3f3f3;
   border-radius: 4px;
   overflow: hidden;
-  height: 45px; /* Tăng chiều cao thanh tìm kiếm */
+  height: 45px;
   border: 1px solid #e0e0e0;
 }
 
@@ -130,22 +104,22 @@ body {
 
 .search-form button {
   border: none;
-  background: #ea580c; /* Đổi nút tìm kiếm thành màu cam */
+  background: #ea580c;
   padding: 0 25px;
   cursor: pointer;
-  color: #fff; /* Icon màu trắng */
+  color: #fff;
   font-size: 18px;
   transition: background-color 0.3s;
 }
 
 .search-form button:hover {
-  background-color: #c2410c; /* Màu cam đậm hơn khi hover */
+  background-color: #c2410c;
 }
 
 /* 4. Actions (User, Cart) */
 .header-actions {
   display: flex;
-  gap: 25px; /* Tăng khoảng cách giữa các icon */
+  gap: 25px;
 }
 
 .action-item {
@@ -159,7 +133,7 @@ body {
 }
 
 .icon-circle {
-  width: 40px; /* Tăng kích thước icon */
+  width: 40px;
   height: 40px;
   border: 1px solid #ea580c;
   border-radius: 50%;
@@ -174,7 +148,6 @@ body {
   background-color: #fff;
 }
 
-/* Hiệu ứng hover */
 .action-item:hover .icon-circle {
   background-color: #ea580c;
   color: #fff;
@@ -185,7 +158,6 @@ body {
   color: #ea580c;
 }
 
-/* Badge số lượng giỏ hàng */
 .cart-badge {
   position: absolute;
   top: -5px;
@@ -199,17 +171,10 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  border: 2px solid #fff; /* Thêm viền trắng để nổi bật */
+  border: 2px solid #fff;
 }
 
-/* --- CSS CHO MENU TÀI KHOẢN (DROPDOWN) --- */
-
-/* 1. Định vị thẻ cha để menu con bám theo */
-/* ================================================= */
-/* --- PHẦN BỔ SUNG: MENU TÀI KHOẢN (DROPDOWN) --- */
-/* ================================================= */
-
-/* 1. Thiết lập vị trí cho menu cha để menu con bám theo */
+/* --- MENU TÀI KHOẢN (DROPDOWN) --- */
 .user-dropdown-parent {
   position: relative !important;
   cursor: pointer;
@@ -217,8 +182,6 @@ body {
   overflow: visible !important;
 }
 
-/* 2. Quan trọng: Chỉnh lại khối chứa Icon và Tên để giống hệt giao diện cũ */
-/* Vì ta đã bọc chúng vào 1 thẻ div mới trong header.php nên cần style lại */
 .user-info-trigger {
   display: flex;
   flex-direction: column; /* Xếp dọc: Icon trên, Tên dưới */
@@ -227,7 +190,6 @@ body {
   color: inherit; /* Giữ màu chữ cũ */
 }
 
-/* 3. Menu con (Cái hộp trắng chứa link) */
 .user-dropdown-menu {
   display: none; /* Mặc định ẩn đi */
   position: absolute; /* Tách khỏi dòng chảy văn bản để không đẩy giao diện */
@@ -247,7 +209,6 @@ body {
   margin-top: 10px; /* Cách ra một chút cho thoáng */
 }
 
-/* Tạo mũi tên nhọn chỉ lên trên (Trang trí) */
 .user-dropdown-menu::before {
   content: "";
   position: absolute;
@@ -259,12 +220,10 @@ body {
   border-bottom: 6px solid #fff;
 }
 
-/* 4. Hiệu ứng Hover: Khi di chuột vào cha thì hiện menu con */
 .user-dropdown-parent:hover .user-dropdown-menu {
   display: block;
 }
 
-/* 5. Style cho các link bên trong (Trang cá nhân, Đăng xuất) */
 .user-dropdown-menu li {
   width: 100%;
   margin: 0;
@@ -282,7 +241,6 @@ body {
   font-weight: normal; /* Chữ thường, không đậm quá */
 }
 
-/* Đổi màu khi di chuột vào từng dòng */
 .user-dropdown-menu li a:hover {
   background-color: #f5f5f5;
   color: #ea580c; /* Màu cam chủ đạo của web bạn */
