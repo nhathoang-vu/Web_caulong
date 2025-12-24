@@ -73,7 +73,7 @@ try {
             <a href="#" class="menu-link"><i class="fa-solid fa-box-open"></i> Đơn hàng <i class="fa-solid fa-chevron-down arrow-down"></i></a>
             <ul class="dropdown">
                 <li><a href="donhang.php">Quản lý đơn hàng</a></li>
-                <li><a href="doitra.php">Quản lý đổi trả</a></li>
+                <li><a href="quanlydoitra.php">Quản lý đổi trả</a></li>
                 <li><a href="phieuxuat.php">Quản lý phiếu xuất</a></li>
             </ul>
         </li>
@@ -155,7 +155,7 @@ try {
     function toggleNotif(event) {
         event.stopPropagation();
         var box = document.getElementById("notifBox");
-        box.classList.toggle("active");
+        if (box) box.classList.toggle("active");
     }
 
     window.onclick = function(event) {
@@ -167,67 +167,75 @@ try {
         }
     }
 
-    // --- SCRIPT AJAX TỰ ĐỘNG CẬP NHẬT (MỚI THÊM VÀO) ---
-    // Cứ 3 giây (3000ms) sẽ tự động chạy đoạn này
+    // --- SCRIPT AJAX CHECK TIN NHẮN LIÊN TỤC ---
     setInterval(function() {
-        fetch('get_notif.php') // Gọi file PHP lấy dữ liệu
-        .then(response => response.json())
+        // 1. Sửa tên file thành nhanthongbao.php
+        // 2. Thêm ?t=... để chống cache (trình duyệt luôn tải mới)
+        fetch('nhanthongbao.php?t=' + Date.now()) 
+        .then(response => {
+            if (!response.ok) {
+                console.error("Lỗi kết nối: Không tìm thấy file nhanthongbao.php");
+                throw new Error("Network response was not ok");
+            }
+            return response.json();
+        })
         .then(data => {
-            // 1. Cập nhật số lượng đỏ (Badge)
+            console.log("Dữ liệu nhận được:", data); // Bật F12 tab Console để xem dòng này chạy không
+
             const badge = document.getElementById('notifBadge');
             const textCount = document.getElementById('notifTextCount');
-            
-            if (data.count > 0) {
-                badge.innerText = data.count;
-                badge.style.display = 'flex'; // Hiện badge
-                textCount.innerText = data.count + ' tin mới';
-            } else {
-                badge.style.display = 'none'; // Ẩn badge
-                textCount.innerText = '0 tin mới';
-            }
-
-            // 2. Cập nhật danh sách tin nhắn
             const listBody = document.getElementById('notifListBody');
-            let htmlContent = '';
-
-            if (data.list.length > 0) {
-                data.list.forEach(item => {
-                    // Xử lý định dạng ngày tháng
-                    const dateObj = new Date(item.ngay_gui);
-                    const dateStr = dateObj.getDate().toString().padStart(2,'0') + '/' + 
-                                    (dateObj.getMonth()+1).toString().padStart(2,'0') + ' ' + 
-                                    dateObj.getHours().toString().padStart(2,'0') + ':' + 
-                                    dateObj.getMinutes().toString().padStart(2,'0');
-                    
-                    // Nếu chưa đọc (trang_thai = 0) thì có nền màu cam nhạt
-                    const bgStyle = (item.trang_thai == 0) ? 'background:#fff3e0;' : '';
-
-                    // Tạo HTML cho từng dòng tin nhắn
-                    htmlContent += `
-                        <a href="phanhoi.php?id=${item.id}" class="notif-item" style="${bgStyle}">
-                            <div class="notif-item-top">
-                                <span class="notif-name">${escapeHtml(item.ho_ten)}</span>
-                                <span class="notif-time">${dateStr}</span>
-                            </div>
-                            <span class="notif-content">${escapeHtml(item.noi_dung)}</span>
-                        </a>
-                    `;
-                });
-            } else {
-                htmlContent = `
-                    <div style="padding: 20px; text-align: center; color: #999;">
-                        <i class="fa-regular fa-envelope-open" style="font-size:20px; margin-bottom:5px;"></i><br>
-                        Không có tin nhắn nào
-                    </div>
-                `;
+            
+            // Cập nhật số lượng
+            if (badge && textCount) {
+                if (data.count > 0) {
+                    badge.innerText = data.count;
+                    badge.style.display = 'flex';
+                    textCount.innerText = data.count + ' tin mới';
+                } else {
+                    badge.style.display = 'none';
+                    textCount.innerText = '0 tin mới';
+                }
             }
-            // Gán HTML mới vào hộp thông báo
-            listBody.innerHTML = htmlContent;
-        })
-        .catch(error => console.error('Error:', error));
-    }, 3000); // 3000ms = 3 giây
 
-    // Hàm phụ để bảo mật, chống lỗi hiển thị khi có ký tự lạ
+            // Cập nhật danh sách
+            if (listBody && data.list) {
+                let htmlContent = '';
+                if (data.list.length > 0) {
+                    data.list.forEach(item => {
+                        // Xử lý ngày tháng
+                        const dateObj = new Date(item.ngay_gui);
+                        const dateStr = dateObj.getDate().toString().padStart(2,'0') + '/' + 
+                                        (dateObj.getMonth()+1).toString().padStart(2,'0') + ' ' + 
+                                        dateObj.getHours().toString().padStart(2,'0') + ':' + 
+                                        dateObj.getMinutes().toString().padStart(2,'0');
+                        
+                        const bgStyle = (item.trang_thai == 0) ? 'background:#fff3e0;' : '';
+
+                        htmlContent += `
+                            <a href="phanhoi.php?id=${item.id}" class="notif-item" style="${bgStyle}">
+                                <div class="notif-item-top">
+                                    <span class="notif-name">${escapeHtml(item.ho_ten)}</span>
+                                    <span class="notif-time">${dateStr}</span>
+                                </div>
+                                <span class="notif-content">${escapeHtml(item.noi_dung)}</span>
+                            </a>
+                        `;
+                    });
+                } else {
+                    htmlContent = `
+                        <div style="padding: 20px; text-align: center; color: #999;">
+                            <i class="fa-regular fa-envelope-open" style="font-size:20px; margin-bottom:5px;"></i><br>
+                            Không có tin nhắn nào
+                        </div>
+                    `;
+                }
+                listBody.innerHTML = htmlContent;
+            }
+        })
+        .catch(error => console.error('Lỗi Ajax:', error));
+    }, 3000); // 3 giây chạy 1 lần
+
     function escapeHtml(text) {
         if (!text) return "";
         return text
