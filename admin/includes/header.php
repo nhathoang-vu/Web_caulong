@@ -81,7 +81,7 @@ try {
             <a href="#" class="menu-link"><i class="fa-solid fa-chart-line"></i> Thống kê <i class="fa-solid fa-chevron-down arrow-down"></i></a>
             <ul class="dropdown">
                 <li><a href="doanhthu.php">Báo cáo doanh thu</a></li>
-                <li><a href="baocao.php">Báo cáo lợi nhuận</a></li>
+                <li><a href="loinhuan.php">Báo cáo lợi nhuận</a></li>
             </ul>
         </li>
         <li class="menu-item">

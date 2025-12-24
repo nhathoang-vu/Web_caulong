@@ -31,6 +31,7 @@ try {
                     CONCAT(
                         '<div class=\"order-item-row\">',
                             '<div class=\"item-thumb\">',
+                                -- ĐÃ SỬA ĐƯỜNG DẪN ẢNH TẠI ĐÂY TỪ uploads/ THÀNH admin/anh_sanpham/
                                 '<img src=\"admin/anh_sanpham/', IFNULL(s.hinh_anh, 'no-image.png'), '\" alt=\"sp\" onerror=\"this.onerror=null; this.src=\'https://via.placeholder.com/60x60.png?text=NO+IMG\';\">',
                             '</div>',
                             '<div class=\"item-info\">',

@@ -99,30 +99,35 @@ $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <th>Khách hàng</th>
                 <th>Ngày đặt</th>
                 <th>Tổng tiền</th>
-                <th>Trạng thái</th>
-                <th width="22%">Hành động</th>
+           
+               <th width="10%" class="text-center">Hành động</th>
             </tr>
         </thead>
-        <tbody>
-            <?php foreach($orders as $row): ?>
-            <tr>
-                <td><b>#<?php echo $row['id']; ?></b></td>
-                <td>
-                    <div class="customer-name"><?php echo htmlspecialchars($row['ten_nguoi_nhan']); ?></div>
-                    <div class="customer-phone"><?php echo htmlspecialchars($row['sdt_nguoi_nhan']); ?></div>
-                </td>
-                <td><?php echo date('d/m/Y H:i', strtotime($row['ngay_dat'])); ?></td>
-                <td class="price-col"><?php echo number_format($row['tong_tien'], 0, ',', '.'); ?>đ</td>
-                <td>
+      <tbody>
+    <?php foreach($orders as $row): ?>
+    <tr>
+        <td><b>#<?php echo $row['id']; ?></b></td>
+        <td>
+            <div class="customer-name"><?php echo htmlspecialchars($row['ten_nguoi_nhan']); ?></div>
+            <div class="customer-phone"><?php echo htmlspecialchars($row['sdt_nguoi_nhan']); ?></div>
+        </td>
+        <td><?php echo date('d/m/Y H:i', strtotime($row['ngay_dat'])); ?></td>
+        <td class="price-col"><?php echo number_format($row['tong_tien'], 0, ',', '.'); ?>đ</td>
+        
+        <td class="action-col">
+            <div class="cell-wrapper">
+                
+                <div class="status-part">
                     <?php
-                        // Sửa lại hiển thị badge cho đủ trạng thái
                         if($row['trang_thai'] == 0) echo '<span class="badge badge-warning">Mới đặt</span>';
                         elseif($row['trang_thai'] == 1) echo '<span class="badge badge-new">Đã xác nhận</span>';
                         elseif($row['trang_thai'] == 2) echo '<span class="badge badge-primary">Đang giao</span>';
                         elseif($row['trang_thai'] == 3) echo '<span class="badge badge-success">Hoàn tất</span>';
+                        elseif($row['trang_thai'] == 4) echo '<span class="badge badge-danger">Đã hủy</span>';
                     ?>
-                </td>
-                <td>
+                </div>
+
+                <div class="buttons-part">
                     <a href="xem_donhang.php?id=<?php echo $row['id']; ?>" class="btn-action btn-view" title="Xem chi tiết">
                         <i class="fa-solid fa-eye"></i>
                     </a>
@@ -142,7 +147,6 @@ $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <a href="?action=cancel&id=<?php echo $row['id']; ?>" class="btn-action btn-cancel" onclick="return confirm('Hủy đơn và hoàn kho ngay lập tức?')" title="Hủy đơn">
                             <i class="fa-solid fa-xmark"></i>
                         </a>
-                      
                         <a href="xem_donhang.php?id=<?php echo $row['id']; ?>" class="btn-action btn-print" title="Vào xem để In phiếu">
                             <i class="fa-solid fa-print"></i>
                         </a>
@@ -159,14 +163,16 @@ $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         </a>
 
                     <?php elseif($row['trang_thai'] == 3): ?>
-                         <a href="xem_donhang.php?id=<?php echo $row['id']; ?>" class="btn-action btn-print" title="Vào xem để In phiếu">
+                            <a href="xem_donhang.php?id=<?php echo $row['id']; ?>" class="btn-action btn-print" title="Vào xem để In phiếu">
                             <i class="fa-solid fa-print"></i>
                         </a>
                     <?php endif; ?>
-                </td>
-            </tr>
-            <?php endforeach; ?>
-        </tbody>
+                </div>
+            </div>
+        </td>
+    </tr>
+    <?php endforeach; ?>
+</tbody>
     </table>
 </div>
 
@@ -181,35 +187,58 @@ $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
 .btn-link-gray { text-decoration: none; color: #fff; background: #555; font-weight: bold; font-size: 13px; padding: 8px 15px; border-radius: 5px; transition: 0.3s; display: flex; align-items: center; gap: 5px; }
 .btn-link-gray:hover { background: #333; }
 
+
+/* ... Giữ nguyên các CSS cơ bản ở trên (header, btn-link...) ... */
+
+/* TABLE STYLES */
 .table-data { width: 100%; border-collapse: collapse; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border-radius: 8px; overflow: hidden; }
 .table-data th { background: #f8f9fa; padding: 12px; text-align: left; border-bottom: 2px solid #eee; color: #555; font-size: 14px; }
-.table-data td { padding: 12px; border-bottom: 1px solid #eee; vertical-align: middle; font-size: 14px; }
+.table-data td { padding: 8px 12px; border-bottom: 1px solid #eee; vertical-align: middle; font-size: 14px; } /* Giảm padding dọc một chút cho gọn */
 .table-data tr:hover { background-color: #fcfcfc; }
 
-.customer-name { font-weight: bold; color: #333; }
-.customer-phone { font-size: 12px; color: #777; }
-.price-col { color: #d32f2f; font-weight: bold; }
+/* LAYOUT CỘT HÀNH ĐỘNG: QUAN TRỌNG */
+.cell-wrapper {
+    display: flex;
+    justify-content: space-between; /* Đẩy 2 thành phần ra 2 đầu (sát viền) */
+    align-items: center;
+    width: 100%;
+}
+
+.status-part {
+    flex-shrink: 0; /* Đảm bảo badge không bị co lại */
+    margin-right: 10px;
+}
+
+.buttons-part {
+    display: flex;
+    justify-content: flex-end; /* Các nút căn phải */
+    gap: 4px; /* Khoảng cách giữa các nút */
+    flex-wrap: nowrap;
+}
 
 /* Badges */
-.badge { padding: 5px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; display: inline-block; color: #fff; }
-.badge-warning { background: #f1c40f; color: #333; } /* Màu vàng cho Mới đặt */
-.badge-new { background: #3498db; } /* Đã xác nhận */
-.badge-primary { background: #2980b9; } /* Đang giao */
-.badge-success { background: #2ecc71; } /* Hoàn tất */
+.badge { padding: 5px 10px; border-radius: 4px; font-size: 11px; font-weight: 600; display: inline-block; color: #fff; min-width: 85px; text-align: center; }
+.badge-warning { background: #f1c40f; color: #333; } 
+.badge-new { background: #3498db; } 
+.badge-primary { background: #2980b9; } 
+.badge-success { background: #2ecc71; } 
+.badge-danger { background: #e74c3c; }
 
 /* Nút hành động */
 .btn-action {
     display: inline-flex; align-items: center; justify-content: center;
-    width: 32px; height: 32px; border-radius: 4px;
-    margin-right: 4px; text-decoration: none; transition: 0.2s; color: #fff;
-    font-size: 13px;
+    width: 30px; height: 30px; /* Nhỏ lại chút cho gọn */
+    border-radius: 4px;
+    text-decoration: none; transition: 0.2s; color: #fff;
+    font-size: 12px;
 }
 .btn-view { background: #7f8c8d; }
-.btn-confirm { background: #27ae60; } /* Nút duyệt xanh lá */
+.btn-confirm { background: #27ae60; } 
 .btn-ship { background: #f39c12; }
 .btn-done { background: #27ae60; }
 .btn-cancel { background: #e74c3c; }
 .btn-print { background: #2c3e50; }
 
 .btn-action:hover { opacity: 0.9; transform: translateY(-1px); }
+
 </style>
