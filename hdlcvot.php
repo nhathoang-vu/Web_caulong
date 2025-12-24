@@ -265,7 +265,8 @@ try {
             <div class="product-grid">
                 <?php if ($count > 0): ?>
                     <?php foreach ($products as $row): 
-                        $img_path = !empty($row['hinh_anh']) ? 'assets/images/'.$row['hinh_anh'] : 'assets/images/no-image.png';
+                        // [CẬP NHẬT] Đường dẫn ảnh là admin/anh_sanpham/
+                        $img_path = !empty($row['hinh_anh']) ? 'admin/anh_sanpham/'.$row['hinh_anh'] : 'assets/images/no-image.png';
                         $gia_ban = $row['gia_ban'];
                         $gia_km = $row['gia_khuyenmai'];
                         $has_sale = ($gia_km > 0 && $gia_km < $gia_ban);

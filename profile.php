@@ -30,7 +30,8 @@ try {
                     CONCAT(
                         '<div class=\"order-item-row\">',
                             '<div class=\"item-thumb\">',
-                                '<img src=\"uploads/', IFNULL(s.hinh_anh, 'no-image.png'), '\" alt=\"sp\" onerror=\"this.onerror=null; this.src=\'https://via.placeholder.com/60x60.png?text=NO+IMG\';\">',
+                                -- ĐÃ SỬA ĐƯỜNG DẪN ẢNH TẠI ĐÂY TỪ uploads/ THÀNH admin/anh_sanpham/
+                                '<img src=\"admin/anh_sanpham/', IFNULL(s.hinh_anh, 'no-image.png'), '\" alt=\"sp\" onerror=\"this.onerror=null; this.src=\'https://via.placeholder.com/60x60.png?text=NO+IMG\';\">',
                             '</div>',
                             '<div class=\"item-info\">',
                                 '<div class=\"item-name\">', REPLACE(IFNULL(s.ten_sanpham, ct.ten_sanpham), '\"', ''), '</div>',

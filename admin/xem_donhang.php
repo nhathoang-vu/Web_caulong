@@ -77,7 +77,7 @@ $items = $stmt_dt->fetchAll(PDO::FETCH_ASSOC);
                 <tr>
                     <td>
                         <div style="display:flex; align-items:center; gap:10px;">
-                            <img src="../assets/images/<?php echo $item['hinh_anh']; ?>" style="width:50px; height:50px; object-fit:cover; border-radius:4px;">
+                            <img src="anh_sanpham/<?php echo $item['hinh_anh']; ?>" style="width:50px; height:50px; object-fit:cover; border-radius:4px;">
                             <span><?php echo htmlspecialchars($item['ten_sanpham']); ?></span>
                         </div>
                     </td>
