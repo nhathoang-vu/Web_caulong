@@ -48,7 +48,7 @@ $profit = $revenue - $cost;
     </div>
 
     <div class="filter-box" style="background:#fff; padding:15px; margin-bottom:20px; border-radius:5px; box-shadow:0 2px 4px rgba(0,0,0,0.1);">
-        <form method="GET" style="display:flex; gap:10px; align-items:center;">
+        <form method="GET" style="display:flex; gap:10px; align-items:center; flex-wrap: wrap;">
             <div>
                 <label>Ngày:</label>
                 <select name="day" style="padding:5px; border:1px solid #ddd; border-radius:4px;">
@@ -73,9 +73,11 @@ $profit = $revenue - $cost;
                     ?>
                 </select>
             </div>
-            <button type="submit" class="btn-filter" style="background:#e67e22; color:white; border:none; padding:6px 15px; border-radius:3px; cursor:pointer;">
-                <i class="fa-solid fa-calculator"></i> Xem Báo Cáo
-            </button>
+            
+
+            <a href="export_profit_pdf.php?day=<?=$d?>&month=<?=$m?>&year=<?=$y?>" target="_blank" style="background:#c0392b; color:white; text-decoration:none; padding:6px 15px; border-radius:3px; display:inline-flex; align-items:center; border:none;">
+                 <i class="fa-solid fa-file-pdf"></i> &nbsp;Xuất PDF Biểu Đồ
+            </a>
         </form>
     </div>
 
